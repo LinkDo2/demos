@@ -100,6 +100,12 @@ jsdap.loadData(dataPreviewDods, function(d){
     console.log(data);
     dataPreviewMap.config({nullValue: NaN}).render().renderRaster(data);
 });
+
+
+d3.json('http://api.planetos.com/v1/datasets/noaa_gfs_global_sflux_0.12d/point?lon=-50.5&lat=49.5&count=1&context=reftime_time_lat_lon&apikey=a7017583aeb944d2b8bfec81ff9a2363', function(error, json){
+    console.log(json);
+});
+
 </script>
 </body>
 </html>
