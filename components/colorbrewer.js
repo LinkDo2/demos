@@ -300,3 +300,16 @@ var colorBrewer = {YlGn: {
 11: ["#8dd3c7","#ffffb3","#bebada","#fb8072","#80b1d3","#fdb462","#b3de69","#fccde5","#d9d9d9","#bc80bd","#ccebc5"],
 12: ["#8dd3c7","#ffffb3","#bebada","#fb8072","#80b1d3","#fdb462","#b3de69","#fccde5","#d9d9d9","#bc80bd","#ccebc5","#ffed6f"]
 }};
+
+colorBrewer.getQuantiles = function(values, buckets){
+    return d3.scale.quantile().domain(values).range(d3.range(buckets)).quantiles();
+};
+
+colorBrewer.equalize = function(_palette){
+    var palette = _palette;
+    return function(values, nullValue){
+        var valuesWithNaNs = values.map(function(d){ return (d === nullValue) ? NaN: d; });
+        var quantiles = colorBrewer.getQuantiles(valuesWithNaNs, palette.length);
+        return d3.scale.linear().domain(quantiles).range(palette);
+    }
+};

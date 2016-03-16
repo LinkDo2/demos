@@ -124,7 +124,7 @@ var parser = {};
         };
         this.parse = this._dataset;
         this._declaration = function() {
-            var type = this.peek("\\w+").toLowerCase();
+            var type = this.peek("[\\w-]+").toLowerCase();
             switch (type) {
               case "grid":
                 return this._grid();
@@ -141,13 +141,13 @@ var parser = {};
         };
         this._base_declaration = function() {
             var baseType = new parser.dapType();
-            baseType.type = this.consume("\\w+");
-            baseType.name = this.consume("\\w+");
+            baseType.type = this.consume("[\\w-]+");
+            baseType.name = this.consume("[\\w-]+");
             baseType.dimensions = [];
             baseType.shape = [];
             while (!this.peek(";")) {
                 this.consume("\\[");
-                var token = this.consume("\\w+");
+                var token = this.consume("[\\w-]+");
                 if (this.peek("=")) {
                     baseType.dimensions.push(token);
                     this.consume("=");
@@ -174,7 +174,7 @@ var parser = {};
                 grid.maps[map_.name] = map_;
             }
             this.consume("}");
-            grid.name = this.consume("\\w+");
+            grid.name = this.consume("[\\w-]+");
             this.consume(";");
             return grid;
         };
@@ -187,7 +187,7 @@ var parser = {};
                 sequence[declaration.name] = declaration;
             }
             this.consume("}");
-            sequence.name = this.consume("\\w+");
+            sequence.name = this.consume("[\\w-]+");
             this.consume(";");
             return sequence;
         };
@@ -200,7 +200,7 @@ var parser = {};
                 structure[declaration.name] = declaration;
             }
             this.consume("}");
-            structure.name = this.consume("\\w+");
+            structure.name = this.consume("[\\w-]+");
             this.consume(";");
             return structure;
         };
@@ -220,7 +220,7 @@ var parser = {};
             return this.dataset;
         };
         this._attr_container = function() {
-            if (atomicTypes.contains(this.peek("\\w+").toLowerCase())) {
+            if (atomicTypes.contains(this.peek("[\\w-]+").toLowerCase())) {
                 this._attribute(this._target.attributes);
                 if (this._target.type === "Grid") {
                     for (map in this._target.maps) {
@@ -237,7 +237,7 @@ var parser = {};
             }
         };
         this._container = function() {
-            var name = this.consume("[\\w_\\.]+");
+            var name = this.consume("[\\w\\-_\\.]+");
             this.consume("{");
             var target;
             if (name.indexOf(".") > -1) {
@@ -267,10 +267,10 @@ var parser = {};
         this._metadata = function() {
             var output = {};
             while (!this.peek("}")) {
-                if (atomicTypes.contains(this.peek("\\w+").toLowerCase())) {
+                if (atomicTypes.contains(this.peek("[\\w-]+").toLowerCase())) {
                     this._attribute(output);
                 } else {
-                    var name = this.consume("\\w+");
+                    var name = this.consume("[\\w-]+");
                     this.consume("{");
                     output[name] = this._metadata();
                     this.consume("}");
@@ -279,13 +279,13 @@ var parser = {};
             return output;
         };
         this._attribute = function(object) {
-            var type = this.consume("\\w+");
+            var type = this.consume("[\\w-]+");
             var name = this.consume("\\b[a-zA-Z0-9_-]+\\b");
             var value;
             var values = [];
             while (!this.peek(";")) {
                 if (type.toLowerCase() === "string") {
-                    value = this.consume('".*?[^\\"]*"');
+                    value = this.consume('["\\\\]+?.*["\\\\]');
                     value = pseudoSafeEval(value);
                 } else if (type.toLowerCase() === "url") {
                     value = this.consume('".*?[^\\\\]"|[^;,]+');
@@ -575,17 +575,27 @@ if (typeof require !== "undefined" && module.exports) {
     var proxyUrl = function(url, callback, binary) {
         var xml = new XMLHttpRequest();
         xml.open("GET", url, true);
-        xml.responseType = "arraybuffer";
+        if(binary){
+            xml.responseType = "arraybuffer";
+        }
+        else{
+            if (xml.overrideMimeType) {
+                xml.overrideMimeType('text/plain; charset=x-user-defined');
+            }
+            else {
+                xml.setRequestHeader('Accept-Charset', 'x-user-defined');
+            }
+        }
         xml.onreadystatechange = function() {
             if (xml.readyState === 4) {
-                var buf =
-                       xml.responseBody           // XHR2
-                    || xml.response               // FF7/Chrome 11-15
-                    || xml.mozResponseArrayBuffer; // FF5
-                if (!binary) {
-                    callback(xml.responseText);
+                if (binary) {
+                    var buf =
+                           xml.responseBody           // XHR2
+                        || xml.response               // FF7/Chrome 11-15
+                        || xml.mozResponseArrayBuffer; // FF5
+                        callback(buf);
                 } else {
-                    callback(buf);
+                    callback(xml.responseText);
                 }
             }
         };

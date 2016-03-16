@@ -54,23 +54,52 @@
 
 var dataPreviewMap = liteMap()
     .config({
-        el: document.querySelector('.container')
+        el: document.querySelector('.container'),
+        colorScale: colorBrewer.equalize(colorBrewer.Spectral[11])
     });
 
-    // d3.json('http://api.planetos.com/v1/datasets/noaa_gfs_global_sflux_0.12d/point?lon=-50.5&lat=49.5&count=1&context=reftime_time_lat_lon&apikey=a7017583aeb944d2b8bfec81ff9a2363', function(error, json){
-    //     console.log(json);
-    //     // dataPreviewMap.render().renderRaster(data);
-    // });
-
-var dataPreviewDods = 'http://thredds.planetos.com/thredds/dodsC/dpipe//rel_0_6x11_dataset/transform/scheme=/ftp/authority=/ftp.ncep.noaa.gov/path=/pub/data/nccf/com/gfs/prod/gfs.2016031512/gfs.t12z.sfluxgrbf252.grib2/chunk=/1/0/preview.dods?Convective_Precipitation_Rate_surface_12_Hour_Average[0:1:0][0:1:287][0:1:575],time1';
-
-jsdap.loadData(dataPreviewDods, function(d){
-    var data = {lat: d[0][2], lon: d[0][3], values: d[0][0][0]}
-    console.log(data);
-    dataPreviewMap.render().renderRaster(data);
+var dataPreviewMetadata = 'http://thredds.planetos.com/thredds/dodsC/dpipe//rel_0_6x11_dataset/transform/scheme=/ftp/authority=/ftp.ncep.noaa.gov/path=/pub/data/nccf/com/gfs/prod/gfs.2016031612/gfs.t12z.sfluxgrbf135.grib2/chunk=/1/0/preview';
+jsdap.loadDataset(dataPreviewMetadata, function(d){
+    var variables = {};
+    for(dB in d){
+        var value = d[dB];
+        if(value.attributes && value.attributes._mx_is_data){
+            var dimensions = {};
+            value.array.dimensions.forEach(function(dC, iC){
+                dimensions[dC] = value.array.shape[iC];
+            });
+            variables[dB] = {
+                name: value.name,
+                longName: value.attributes.long_name.replace(/"/gi, ''),
+                abbreviatedName: value.attributes.abbreviation.replace(/"/gi, ''),
+                type: value.type,
+                dimensions: dimensions,
+                units: value.attributes.units.replace(/"/gi, ''),
+                missingValue: (typeof value.attributes.missing_value !== 'undefined') ? value.attributes.missing_value : value.attributes._FillValue
+            };
+        }
+    }
+    console.log(variables);
 });
 
+var dimensionFilters = [[0, 1, 0], [0, 1, 287], [0, 1, 575]];
+var dataPreviewDods = 'http://thredds.planetos.com/thredds/dodsC/dpipe//rel_0_6x11_dataset/transform/scheme=/ftp/authority=/ftp.ncep.noaa.gov/path=/pub/data/nccf/com/gfs/prod/gfs.2016031512/gfs.t12z.sfluxgrbf252.grib2/chunk=/1/0/preview.dods?Convective_Precipitation_Rate_surface_12_Hour_Average'+dimensionFilters.map(function(d){ return '['+d.join(':')+']'; }).join('')+',time1';
 
+var dimensionFilters = [[0, 1, 0], [0, 1, 0], [0, 1, 383], [0, 1, 767]];
+var dataPreviewDods = 'http://thredds.planetos.com/thredds/dodsC/dpipe//rel_0_6x11_dataset/transform/scheme=/ftp/authority=/ftp.ncep.noaa.gov/path=/pub/data/nccf/com/gfs/prod/gfs.2016031606/gfs.t06z.sfluxgrbf237.grib2/chunk=/1/0/preview.dods?Maximum_temperature_height_above_ground_3_Hour_Interval'+dimensionFilters.map(function(d){ return '['+d.join(':')+']'; }).join('')+',time1';
+
+jsdap.loadData(dataPreviewDods, function(d){
+    var dimensionCount = dimensionFilters.length;
+    var lat = d[0][dimensionCount - 1];
+    var lon = d[0][dimensionCount];
+    var values = d;
+    for (var i = 0; i < dimensionCount; i++) {
+        values = values[0];
+    }
+    var data = {lat: lat, lon: lon, values: values}
+    console.log(data);
+    dataPreviewMap.config({nullValue: NaN}).render().renderRaster(data);
+});
 </script>
 </body>
 </html>

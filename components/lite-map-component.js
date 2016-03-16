@@ -9,6 +9,7 @@ var liteMap = function(){
         rotation: [0, 0],
         colorScale: function(values){ return d3.scale.linear().domain(d3.extent(values)).range(['black', 'white']); },
         unit: '',
+        nullValue: null,
         antemeridianCuttingCheck: false,
         windingCheck: true,
         projection: 'equirectangular'
@@ -203,7 +204,7 @@ var liteMap = function(){
             //console.log('data', rasterData[indexLat][indexLon]);
 
             var rasterValue = rasterData[indexLat][indexLon];
-            var tooltipText = (rasterValue === null || typeof rasterValue === 'undefined') ? '' : rasterValue + ' ' + config.unit;
+            var tooltipText = (rasterValue === config.nullValue || typeof rasterValue === 'undefined') ? '' : rasterValue + ' ' + config.unit;
 
             tooltip.text(tooltipText)
                 .style({
@@ -225,7 +226,7 @@ var liteMap = function(){
 
         var dataExtent = d3.extent(rasterData1D);
 
-        var colorScale = config.colorScale(rasterData1D);
+        var colorScale = config.colorScale(rasterData1D, config.nullValue);
 
         var location, rasterPoint, sx, sy;
         var rectWidth = Math.ceil(width / rasterLon.length);
@@ -241,7 +242,7 @@ var liteMap = function(){
             var rasterValue = rasterData[datum[0]][datum[1]];
             var rasterPointProjected = projection([dataLon, dataLat]);
 
-            if(!isNaN(rasterValue) && rasterValue !== null){
+            if(!isNaN(rasterValue) && rasterValue !== config.nullValue){
                 var color = d3.rgb(colorScale(rasterValue)).toString();
                 ctx.beginPath();
                 ctx.fillStyle = color;
