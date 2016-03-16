@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<script src="../vendors/d3.js"></script>
+<script src="../vendors/topojson.js"></script>
+<script src="../components/world-110m.js"></script>
+<script src="../components/render-slicer.js"></script>
+<script src="../components/colorbrewer.js"></script>
+<script src="../components/utils.js"></script>
+<script src="../components/lite-map-component.js"></script>
+<script src="../vendors/jsdap.js"></script>
+<style>
+
+    .map .panel-background {
+        display: none;
+    }
+
+    .map .graticule, .equator {
+        stroke: #eee;
+        stroke-opacity: 0.1;
+    }
+
+    .map .country {
+        fill: transparent;
+        stroke: #eee;
+        stroke-opacity: 0.2;
+    }
+
+    .map .polygon {
+        fill: skyblue;
+        fill-opacity: 0.3;
+        stroke: skyblue;
+        stroke-width: 1px;
+        stroke-opacity: 1;
+    }
+
+    .map .tooltip {
+        fill: black;
+        font-weight: bolder;
+        text-shadow:
+        -1px -1px 0 #fff,
+        1px -1px 0 #fff,
+        -1px 1px 0 #fff,
+        1px 1px 0 #fff;
+    }
+</style>
+</head>
+<body>
+
+<div class="container"></div>
+
+<script>
+
+var dataPreviewMap = liteMap()
+    .config({
+        el: document.querySelector('.container')
+    });
+
+    // d3.json('http://api.planetos.com/v1/datasets/noaa_gfs_global_sflux_0.12d/point?lon=-50.5&lat=49.5&count=1&context=reftime_time_lat_lon&apikey=a7017583aeb944d2b8bfec81ff9a2363', function(error, json){
+    //     console.log(json);
+    //     // dataPreviewMap.render().renderRaster(data);
+    // });
+
+var dataPreviewDods = 'http://thredds.planetos.com/thredds/dodsC/dpipe//rel_0_6x11_dataset/transform/scheme=/ftp/authority=/ftp.ncep.noaa.gov/path=/pub/data/nccf/com/gfs/prod/gfs.2016031512/gfs.t12z.sfluxgrbf252.grib2/chunk=/1/0/preview.dods?Convective_Precipitation_Rate_surface_12_Hour_Average[0:1:0][0:1:287][0:1:575],time1';
+
+jsdap.loadData(dataPreviewDods, function(d){
+    var data = {lat: d[0][2], lon: d[0][3], values: d[0][0][0]}
+    console.log(data);
+    dataPreviewMap.render().renderRaster(data);
+});
+
+
+</script>
+</body>
+</html>
