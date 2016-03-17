@@ -220,11 +220,8 @@ var liteMap = function(){
         .on('click', function(){
             var mouse = d3.mouse(this);
             var projectedCoordinates = projection.invert(mouse);
-            // var coordX = ((projectedCoordinates[0] + 360) % 360) / 2 - 90;
             var coordX = ((projectedCoordinates[0] + 360) % 360);
             var coordY = projectedCoordinates[1];
-            // events.click([coordX, coordY]);
-            console.log(projectedCoordinates, [coordX, coordY]);
             events.click(projectedCoordinates);
         });
 
