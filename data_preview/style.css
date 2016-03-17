@@ -1,0 +1,100 @@
+div, header, footer, nav {
+    border: 1px solid silver;
+}
+
+/* layout */
+#main {
+    min-height: 800px;
+    padding: 0px;
+    display: -webkit-flex;
+    display: flex;
+    -webkit-flex-flow: row;
+    flex-flow: row;
+}
+#main > article {
+    padding: 0 45px;
+    -webkit-flex: 3 1 60%;
+    flex: 3 1 60%;
+    -webkit-order: 2;
+    order: 2;
+}
+#main > nav {
+    padding: 25px;
+    -webkit-flex: 1 6 100px;
+    flex: 1 6 100px;
+    -webkit-order: 1;
+    order: 1;
+}
+#main > aside {
+    padding: 25px;
+    -webkit-flex: 1 6 20%;
+    flex: 1 6 20%;
+    -webkit-order: 3;
+    order: 3;
+}
+header, footer {
+    display: block;
+    padding: 5px;
+}
+
+header {
+}
+
+footer {
+    min-height: 20px;
+}
+
+.content-wrapper {
+    max-width: 1000px;
+    margin: 0 auto;
+}
+
+@media all and (max-width: 640px) {
+    #main, #page {
+        -webkit-flex-flow: column;
+        flex-direction: column;
+    }
+    #main > article, #main > nav, #main > aside {
+        -webkit-order: 0;
+        order: 0;
+    }
+}
+
+/* map */
+.map .panel-background {
+    display: none;
+}
+
+.map .graticule, .equator {
+    stroke: #eee;
+    stroke-opacity: 0.1;
+}
+
+.map .country {
+    fill: transparent;
+    stroke: #eee;
+    stroke-opacity: 0.2;
+}
+
+.map .polygon {
+    fill: skyblue;
+    fill-opacity: 0.3;
+    stroke: skyblue;
+    stroke-width: 1px;
+    stroke-opacity: 1;
+}
+
+.map .tooltip {
+    fill: black;
+    font-weight: bolder;
+    text-shadow:
+    -1px -1px 0 #fff,
+    1px -1px 0 #fff,
+    -1px 1px 0 #fff,
+    1px 1px 0 #fff;
+}
+
+/* navigation */
+nav ul {
+    list-style-type: none;
+}

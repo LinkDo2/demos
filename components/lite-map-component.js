@@ -18,6 +18,8 @@ var liteMap = function(){
         //projection: 'orthographic'
     };
 
+    var events = d3.dispatch('click');
+
     var height = 0;
     var width = 0;
     var countries = null;
@@ -196,12 +198,7 @@ var liteMap = function(){
             var indexLon = d3.bisect(rasterLon, coordX);
             var indexLat = latIsSorted ? d3.bisect(rasterLat, coordY) : bisect.right(rasterLat, coordY);
 
-
             if(!(indexLat && rasterLat[indexLat])) return this;
-            //console.log('----------------------------------');
-            //console.log('lat', indexLat, coordY, rasterLat[indexLat]);
-            //console.log('lon', indexLon, coordX, rasterLon[indexLon]);
-            //console.log('data', rasterData[indexLat][indexLon]);
 
             var rasterValue = rasterData[indexLat][indexLon];
             var tooltipText = (rasterValue === config.nullValue || typeof rasterValue === 'undefined') ? '' : rasterValue + ' ' + config.unit;
@@ -219,6 +216,16 @@ var liteMap = function(){
             tooltip.style({
                     display: 'none'
                 });
+        })
+        .on('click', function(){
+            var mouse = d3.mouse(this);
+            var projectedCoordinates = projection.invert(mouse);
+            // var coordX = ((projectedCoordinates[0] + 360) % 360) / 2 - 90;
+            var coordX = ((projectedCoordinates[0] + 360) % 360);
+            var coordY = projectedCoordinates[1];
+            // events.click([coordX, coordY]);
+            console.log(projectedCoordinates, [coordX, coordY]);
+            events.click(projectedCoordinates);
         });
 
         var ctx = canvasNode.getContext('2d');
@@ -429,7 +436,7 @@ var liteMap = function(){
         return this;
     };
 
-    return {
+    var exports = {
 
         config: setConfig,
 
@@ -444,5 +451,9 @@ var liteMap = function(){
         enableZoom: enableZoom,
 
         disableMouseWheelZoom: disableMouseWheelZoom
-    }
+    };
+
+    d3.rebind(exports, events, 'on');
+
+    return exports;
 };

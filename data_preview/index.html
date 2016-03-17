@@ -10,102 +10,27 @@
 <script src="../components/utils.js"></script>
 <script src="../components/lite-map-component.js"></script>
 <script src="../vendors/jsdap.js"></script>
-<style>
-
-    .map .panel-background {
-        display: none;
-    }
-
-    .map .graticule, .equator {
-        stroke: #eee;
-        stroke-opacity: 0.1;
-    }
-
-    .map .country {
-        fill: transparent;
-        stroke: #eee;
-        stroke-opacity: 0.2;
-    }
-
-    .map .polygon {
-        fill: skyblue;
-        fill-opacity: 0.3;
-        stroke: skyblue;
-        stroke-width: 1px;
-        stroke-opacity: 1;
-    }
-
-    .map .tooltip {
-        fill: black;
-        font-weight: bolder;
-        text-shadow:
-        -1px -1px 0 #fff,
-        1px -1px 0 #fff,
-        -1px 1px 0 #fff,
-        1px 1px 0 #fff;
-    }
-</style>
+<link rel="stylesheet" href="style.css" charset="utf-8">
 </head>
 <body>
 
-<div class="container"></div>
+    <header>
+        Planet OS APIs demo
+    </header>
+    <div id="main">
+        <article>
+            <div class="content-wrapper">
+                <div class="container"></div>
+            </div>
+        </article>
+        <nav>
+            <div class="variable-details"></div>
+            <ul class="variables"></ul>
+        </nav>
+    </div>
+    <footer>Copyright Planet OS 2016</footer>
 
-<script>
+    <script src="app.js"></script>
 
-var dataPreviewMap = liteMap()
-    .config({
-        el: document.querySelector('.container'),
-        colorScale: colorBrewer.equalize(colorBrewer.Spectral[11])
-    });
-
-var dataPreviewMetadata = 'http://thredds.planetos.com/thredds/dodsC/dpipe//rel_0_6x11_dataset/transform/scheme=/ftp/authority=/ftp.ncep.noaa.gov/path=/pub/data/nccf/com/gfs/prod/gfs.2016031612/gfs.t12z.sfluxgrbf135.grib2/chunk=/1/0/preview';
-jsdap.loadDataset(dataPreviewMetadata, function(d){
-    var variables = {};
-    for(dB in d){
-        var value = d[dB];
-        if(value.attributes && value.attributes._mx_is_data){
-            var dimensions = {};
-            value.array.dimensions.forEach(function(dC, iC){
-                dimensions[dC] = value.array.shape[iC];
-            });
-            variables[dB] = {
-                name: value.name,
-                longName: value.attributes.long_name.replace(/"/gi, ''),
-                abbreviatedName: value.attributes.abbreviation.replace(/"/gi, ''),
-                type: value.type,
-                dimensions: dimensions,
-                units: value.attributes.units.replace(/"/gi, ''),
-                missingValue: (typeof value.attributes.missing_value !== 'undefined') ? value.attributes.missing_value : value.attributes._FillValue
-            };
-        }
-    }
-    console.log(variables);
-});
-
-var dimensionFilters = [[0, 1, 0], [0, 1, 287], [0, 1, 575]];
-var dataPreviewDods = 'http://thredds.planetos.com/thredds/dodsC/dpipe//rel_0_6x11_dataset/transform/scheme=/ftp/authority=/ftp.ncep.noaa.gov/path=/pub/data/nccf/com/gfs/prod/gfs.2016031512/gfs.t12z.sfluxgrbf252.grib2/chunk=/1/0/preview.dods?Convective_Precipitation_Rate_surface_12_Hour_Average'+dimensionFilters.map(function(d){ return '['+d.join(':')+']'; }).join('')+',time1';
-
-var dimensionFilters = [[0, 1, 0], [0, 1, 0], [0, 1, 383], [0, 1, 767]];
-var dataPreviewDods = 'http://thredds.planetos.com/thredds/dodsC/dpipe//rel_0_6x11_dataset/transform/scheme=/ftp/authority=/ftp.ncep.noaa.gov/path=/pub/data/nccf/com/gfs/prod/gfs.2016031606/gfs.t06z.sfluxgrbf237.grib2/chunk=/1/0/preview.dods?Maximum_temperature_height_above_ground_3_Hour_Interval'+dimensionFilters.map(function(d){ return '['+d.join(':')+']'; }).join('')+',time1';
-
-jsdap.loadData(dataPreviewDods, function(d){
-    var dimensionCount = dimensionFilters.length;
-    var lat = d[0][dimensionCount - 1];
-    var lon = d[0][dimensionCount];
-    var values = d;
-    for (var i = 0; i < dimensionCount; i++) {
-        values = values[0];
-    }
-    var data = {lat: lat, lon: lon, values: values}
-    console.log(data);
-    dataPreviewMap.config({nullValue: NaN}).render().renderRaster(data);
-});
-
-
-d3.json('http://api.planetos.com/v1/datasets/noaa_gfs_global_sflux_0.12d/point?lon=-50.5&lat=49.5&count=1&context=reftime_time_lat_lon&apikey=a7017583aeb944d2b8bfec81ff9a2363', function(error, json){
-    console.log(json);
-});
-
-</script>
 </body>
 </html>
