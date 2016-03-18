@@ -1,10 +1,11 @@
 var VariableListView = Backbone.View.extend({
+
     events: {},
 
     initialize: function(options) {
         this.metadataCollection = options.metadataCollection;
 
-        this.listenTo(this.metadataCollection, 'change reset', this.render);
+        this.listenTo(this.metadataCollection, 'reset', this.render);
     },
 
     render: function(collection) {
@@ -21,17 +22,26 @@ var VariableListView = Backbone.View.extend({
 });
 
 var MapView = Backbone.View.extend({
-    events: {},
 
     initialize: function(options) {
+        var that = this;
         this.previewDataModel = options.previewDataModel;
+
+        this.map = liteMap()
+            .config({
+                el: this.el,
+                colorScale: colorBrewer.equalize(colorBrewer.Spectral[11])
+            })
+            .on('click', function(d) {
+                that.trigger('click', d);
+            });
 
         this.listenTo(this.previewDataModel, 'change', this.render);
     },
 
     render: function(model) {
         var data = model.toJSON();
-        dataPreviewMap.config({
+        this.map.config({
                 nullValue: NaN
             })
             .render().renderRaster(data);
@@ -39,6 +49,7 @@ var MapView = Backbone.View.extend({
 });
 
 var MetadataView = Backbone.View.extend({
+
     events: {},
 
     initialize: function(options) {

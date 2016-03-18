@@ -1,21 +1,21 @@
-var queryModel = new DataQueryModel();
-var previewModel = new PreviewQueryModel();
+var dataQueryModel = new DataQueryModel();
+var dataPreviewQueryModel = new DataPreviewQueryModel();
 
 var metadataCollection = new MetadataCollection({
-    queryModel: queryModel
+    queryModel: dataQueryModel
 });
 
 var activeMetadataModel = new ActiveMetadataModel({
-    queryModel: queryModel,
+    queryModel: dataQueryModel,
     metadataCollection: metadataCollection
 });
 
 var dataCollection = new DataCollection({
-    queryModel: queryModel
+    queryModel: dataQueryModel
 });
 
 var previewDataModel = new PreviewDataModel({
-    queryModel: previewModel
+    queryModel: dataPreviewQueryModel
 });
 
 var variableListView = new VariableListView({
@@ -23,18 +23,11 @@ var variableListView = new VariableListView({
 });
 
 var mapView = new MapView({
-    previewDataModel: previewDataModel
-});
-
-var MetadataView = new MetadataView({});
-
-var dataPreviewMap = liteMap()
-    .config({
         el: document.querySelector('.container'),
-        colorScale: colorBrewer.equalize(colorBrewer.Spectral[11])
+        previewDataModel: previewDataModel
     })
     .on('click', function(d) {
-        queryModel.set({
+        dataQueryModel.set({
             lon: d[0],
             lat: d[1],
             context: 'reftime_time_lat_lon',
@@ -48,19 +41,49 @@ var dataPreviewMap = liteMap()
         });
     });
 
-metadataCollection.fetch({
-    success: function(collection, response) {
-        console.log('metadata', collection);
-    },
-    reset: true
+var MetadataView = new MetadataView({});
+
+dataQueryModel.set({
+    baseURL: 'http://api.planetos.com/v1/datasets/',
+    datasetName: 'noaa_gfs_global_sflux_0.12d',
+    lon: 0,
+    lat: 0,
+    apiKey: 'a7017583aeb944d2b8bfec81ff9a2363',
+    isVerbose: true,
+    context: null,
+    count: null
 });
 
-previewDataModel.fetch({
-    success: function(data, response) {
-        console.log('preview data', data);
-    },
-    reset: true
+dataPreviewQueryModel.set({
+    threddsURL: 'http://thredds.planetos.com/thredds/dodsC/dpipe//',
+    releaseVersion: 'rel_0_6x11_dataset/transform/',
+    scheme: 'scheme=/ftp/',
+    authority: 'authority=/ftp.ncep.noaa.gov/',
+    path: 'path=/pub/data/nccf/com/gfs/prod/',
+    datasetName: 'gfs.2016031706/gfs.t06z.sfluxgrbf252.grib2/',
+    chunk: 'chunk=/1/0/preview',
+    variableName: 'Maximum_temperature_height_above_ground_12_Hour_Interval',
+    dimensionFilters: [
+        [0, 1, 0],
+        [0, 1, 0],
+        [0, 1, 287],
+        [0, 1, 575]
+    ]
 });
+
+// metadataCollection.fetch({
+//     success: function(collection, response) {
+//         console.log('metadata', collection);
+//     },
+//     reset: true
+// });
+
+// previewDataModel.fetch({
+//     success: function(data, response) {
+//         console.log('preview data', data);
+//     },
+//     reset: true
+// });
 
 var variableDetailsNode = document.querySelector('.variable-details');
 window.addEventListener("hashchange", function() {

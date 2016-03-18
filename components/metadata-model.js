@@ -15,10 +15,10 @@ var ActiveMetadataModel = MetadataModel.extend({
         this.queryModel = options.queryModel;
         this.metadataCollection = options.metadataCollection;
 
-        this.listenTo(this.queryModel , 'change', this.setActiveModel);
+        this.listenTo(this.queryModel, 'change set', this.setActiveModel);
     },
 
-    setActiveModel: function(model){
+    setActiveModel: function(model) {
         console.log(666);
     }
 });
@@ -28,7 +28,12 @@ var MetadataCollection = BaseCollection.extend({
     model: MetadataModel,
 
     initialize: function(options) {
-        this.query = options.queryModel;
+        this.queryModel = options.queryModel;
+        this.listenTo(this.queryModel, 'change set', function() {
+            this.fetch({
+                reset: true
+            });
+        });
     },
 
     parse: function(response) {

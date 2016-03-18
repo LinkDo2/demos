@@ -9,14 +9,16 @@ var PreviewDataModel = Backbone.Model.extend({
     },
 
     initialize: function(options) {
-        this.query = options.queryModel;
+        this.queryModel = options.queryModel;
+
+        this.listenTo(this.queryModel, 'change', function(){ this.fetch({reset: true}); });
     },
 
-    fetch: function(callbacks){
+    fetch: function(){
         var that = this;
-        var q = this.query.toJSON();
+        var q = this.queryModel.toJSON();
 
-        var dataPreviewDods = q.threddsURL + q.releaseVersion + q.scheme + q.authority + q.path + q.chunk + '.dods?' + q.variableName + q.dimensionFilters.map(function(d) {
+        var dataPreviewDods = q.threddsURL + q.releaseVersion + q.scheme + q.authority + q.path + q.datasetName + q.chunk + '.dods?' + q.variableName + q.dimensionFilters.map(function(d) {
             return '[' + d.join(':') + ']';
         }).join('') + ',time1';
 
@@ -35,7 +37,6 @@ var PreviewDataModel = Backbone.Model.extend({
             }
 
             that.set(data);
-            callbacks.success(data);
         });
     }
 });
