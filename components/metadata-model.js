@@ -10,6 +10,19 @@ var MetadataModel = Backbone.Model.extend({
     }
 });
 
+var ActiveMetadataModel = MetadataModel.extend({
+    initialize: function(options) {
+        this.queryModel = options.queryModel;
+        this.metadataCollection = options.metadataCollection;
+
+        this.listenTo(this.queryModel , 'change', this.setActiveModel);
+    },
+
+    setActiveModel: function(model){
+        console.log(666);
+    }
+});
+
 var MetadataCollection = BaseCollection.extend({
 
     model: MetadataModel,

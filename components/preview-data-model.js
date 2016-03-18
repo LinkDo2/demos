@@ -1,26 +1,19 @@
 var PreviewDataModel = Backbone.Model.extend({
-    defaults: {
-        context: null,
-        key: null,
-        longName: null,
-        missingValue: null,
-        name: null,
-        units: null,
-        abbreviation: null
-    }
-});
-
-var PreviewDataCollection = Backbone.Collection.extend({
 
     url: '',
 
-    model: PreviewDataModel,
+    defaults: {
+        lat: null,
+        lon: null,
+        values: null
+    },
 
     initialize: function(options) {
         this.query = options.queryModel;
     },
 
     fetch: function(callbacks){
+        var that = this;
         var q = this.query.toJSON();
 
         var dataPreviewDods = q.threddsURL + q.releaseVersion + q.scheme + q.authority + q.path + q.chunk + '.dods?' + q.variableName + q.dimensionFilters.map(function(d) {
@@ -28,7 +21,7 @@ var PreviewDataCollection = Backbone.Collection.extend({
         }).join('') + ',time1';
 
         jsdap.loadData(dataPreviewDods, function(d) {
-            var dimensionCount = dimensionFilters.length;
+            var dimensionCount = d[0].length - 1;
             var lat = d[0][dimensionCount - 1];
             var lon = d[0][dimensionCount];
             var values = d;
@@ -40,12 +33,9 @@ var PreviewDataCollection = Backbone.Collection.extend({
                 lon: lon,
                 values: values
             }
+
+            that.set(data);
             callbacks.success(data);
         });
-    },
-
-    parse: function(response) {
-
-        return response;
     }
 });

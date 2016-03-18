@@ -1,45 +1,32 @@
-/*
-TODO
--wrap views (map, list, details, charts)
-*/
-
 var queryModel = new DataQueryModel();
 var previewModel = new PreviewQueryModel();
 
 var metadataCollection = new MetadataCollection({
-        queryModel: queryModel
-    });
-metadataCollection.fetch({
-        success: function(collection, response) {
-            console.log('metadata', collection);
+    queryModel: queryModel
+});
 
-            var variableNames = collection.map(function(d){ return d.get('name'); });
-            var list = document.querySelector('.variables');
-                var listElementsHTML = variableNames.map(function(d) {
-                    return '<li><a href="#' + d + '">' + d + '</a></li>';
-                }).join('\n');
-
-                list.innerHTML = listElementsHTML;
-        }
-    });
+var activeMetadataModel = new ActiveMetadataModel({
+    queryModel: queryModel,
+    metadataCollection: metadataCollection
+});
 
 var dataCollection = new DataCollection({
-        queryModel: queryModel
-    });
+    queryModel: queryModel
+});
 
-var previewDataCollection = new PreviewDataCollection({
-        queryModel: previewModel
-    });
-previewDataCollection.fetch({
-        success: function(data, response) {
-            console.log('preview data', data);
+var previewDataModel = new PreviewDataModel({
+    queryModel: previewModel
+});
 
-            dataPreviewMap.config({
-                    nullValue: NaN
-                })
-                .render().renderRaster(data);
-        }
-    });
+var variableListView = new VariableListView({
+    metadataCollection: metadataCollection
+});
+
+var mapView = new MapView({
+    previewDataModel: previewDataModel
+});
+
+var MetadataView = new MetadataView({});
 
 var dataPreviewMap = liteMap()
     .config({
@@ -60,6 +47,20 @@ var dataPreviewMap = liteMap()
             }
         });
     });
+
+metadataCollection.fetch({
+    success: function(collection, response) {
+        console.log('metadata', collection);
+    },
+    reset: true
+});
+
+previewDataModel.fetch({
+    success: function(data, response) {
+        console.log('preview data', data);
+    },
+    reset: true
+});
 
 var variableDetailsNode = document.querySelector('.variable-details');
 window.addEventListener("hashchange", function() {
