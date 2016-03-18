@@ -39,6 +39,8 @@ var DataCollection = BaseCollection.extend({
             });
         }
 
+        console.log('DataCollection', '\nraw: ', response, '\nparsed: ', data);
+
         return data;
     }
 });

@@ -14,6 +14,8 @@ var BaseCollection = Backbone.Collection.extend({
         if(q.count !== null) {
             url += '&count=' + q.count;
         }
+
+        console.log('Data query', url);
         return url;
     }
 });
