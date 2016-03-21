@@ -1,6 +1,5 @@
 /*
     TODO
-    -metadata from thredds
     -variable info view
     -point data view
     -variable info interaction
@@ -8,6 +7,7 @@
     -point data interaction
 */
 
+// Query Models
 var dataQueryModel = new DataQueryModel();
 var metadataQueryModel = new DataQueryModel();
 var dataPreviewQueryModel = new DataPreviewQueryModel();
@@ -18,6 +18,7 @@ var metadataCollection = new MetadataCollection({
     dataPreviewQueryModel: dataPreviewQueryModel
 });
 
+// Data models
 var dataCollection = new DataCollection({
     queryModel: dataQueryModel
 });
@@ -30,8 +31,10 @@ var previewMetadataModel = new PreviewMetadataModel({
     queryModel: metadataPreviewQueryModel
 });
 
+// Views
 var variableListView = new VariableListView({
-    metadataCollection: metadataCollection
+    // metadataCollection: metadataCollection
+    metadataCollection: previewMetadataModel
 });
 
 var mapView = new MapView({
@@ -51,6 +54,7 @@ var mapView = new MapView({
 
 var MetadataView = new MetadataView({});
 
+// Fetch models
 metadataQueryModel.set({
     baseURL: 'http://api.planetos.com/v1/datasets/',
     datasetName: 'noaa_gfs_global_sflux_0.12d',

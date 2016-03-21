@@ -1,3 +1,16 @@
+var PreviewMetadataModel = Backbone.Model.extend({
+    defaults: {
+        context: null,
+        key: null,
+        longName: null,
+        missingValue: null,
+        name: null,
+        units: null,
+        abbreviation: null,
+        dimensions: null
+    }
+});
+
 var PreviewDataModel = Backbone.Model.extend({
 
     url: '',
@@ -45,15 +58,11 @@ var PreviewDataModel = Backbone.Model.extend({
     }
 });
 
-var PreviewMetadataModel = Backbone.Model.extend({
+var PreviewMetadataModel = Backbone.Collection.extend({
 
     url: '',
 
-    defaults: {
-        lat: null,
-        lon: null,
-        values: null
-    },
+    model: PreviewMetadataModel,
 
     initialize: function(options) {
         this.queryModel = options.queryModel;
@@ -70,7 +79,7 @@ var PreviewMetadataModel = Backbone.Model.extend({
         console.log('Preview data query', dataPreviewDods);
 
         jsdap.loadDataset(dataPreviewDods, function(d) {
-            var variables = {};
+            var variables = [];
             for(var dB in d) {
                 var value = d[dB];
                 if(value.attributes && value.attributes._mx_is_data) {
@@ -78,22 +87,25 @@ var PreviewMetadataModel = Backbone.Model.extend({
                     value.array.dimensions.forEach(function(dC, iC) {
                         dimensions[dC] = value.array.shape[iC];
                     });
-                    variables[dB] = {
-                        name: value.name,
+                    var context = value.attributes._mx_parent_context.replace(/"context_/gi, '')
+                    context = context.replace(/context_/gi, '')
+                    context = context.replace(/"/gi, '')
+                    variables.push({
+                        key: value.id,
+                        name: value.attributes.standard_name.replace(/"/gi, ''),
                         longName: value.attributes.long_name.replace(/"/gi, ''),
-                        abbreviatedName: value.attributes.abbreviation.replace(/"/gi, ''),
+                        abbreviation: value.attributes.abbreviation.replace(/"/gi, ''),
                         type: value.type,
                         dimensions: dimensions,
                         units: value.attributes.units.replace(/"/gi, ''),
-                        missingValue: (typeof value.attributes.missing_value !== 'undefined') ? value.attributes.missing_value : value.attributes._FillValue
-                    };
+                        missingValue: (typeof value.attributes.missing_value !== 'undefined') ? value.attributes.missing_value : value.attributes._FillValue,
+                        context: context
+                    });
                 }
             }
-            console.log('variables: ', variables);
 
-
+            that.reset(variables);
             console.log('PreviewMetadataModel', '\nraw: ', d, '\nparsed: ', variables);
-
         });
     }
 });

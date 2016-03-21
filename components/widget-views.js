@@ -10,7 +10,7 @@ var VariableListView = Backbone.View.extend({
 
     render: function(collection) {
         var variableNames = collection.map(function(d) {
-            return d.get('name');
+            return d.get('longName');
         });
         var list = document.querySelector('.variables');
         var listElementsHTML = variableNames.map(function(d) {
