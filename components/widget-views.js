@@ -5,25 +5,40 @@ var VariableListView = Backbone.View.extend({
         this.dataCollection = options.dataCollection;
 
         this.listenTo(this.metadataCollection, 'reset', this.render);
-        this.listenTo(this.dataCollection, 'reset', this.renderData);
+        this.listenTo(this.dataCollection, 'reset', this.render);
+    },
+
+    render: function(collection) {
+        var elementsHTML = this.metadataCollection.map(function(model) {
+            var data = this.dataCollection.filter(function(d) {
+                return d.get('key') === model.get('key');
+            })[0];
+
+            if(data) {
+                return '<div class="variable-element">' +
+                    '<div class="name">' + model.get('longName') + '</div>' +
+                    '<div class="data">' + JSON.stringify(data.get('values')) + '</div>' +
+                    '</div>';
+            } else {
+                return '<div class="variable-element"><div class="name">' + model.get('longName') + '</div></div>';
+            }
+        }).join('\n');
+
+        this.el.innerHTML = elementsHTML;
+    }
+});
+
+var PreviewVariableListView = Backbone.View.extend({
+
+    initialize: function(options) {
+        this.metadataCollection = options.metadataCollection;
+
+        this.listenTo(this.metadataCollection, 'reset', this.render);
     },
 
     render: function(collection) {
         var elementsHTML = this.metadataCollection.map(function(model) {
             return '<div class="variable-element"><a href="#' + model.get('key') + '">' + model.get('longName') + '</a></div>';
-        }).join('\n');
-
-        this.el.innerHTML = elementsHTML;
-    },
-
-    renderData: function(collection) {
-        var elementsHTML = this.metadataCollection.map(function(model) {
-            var data = this.dataCollection.filter(function(d){ return d.get('key'); })[0];
-
-            return '<div class="variable-element">' +
-                '<a href="#' + model.get('key') + '">' + model.get('longName') + '</a>' +
-                '<div class="data">' + JSON.stringify(data.get('values')) + '</div>' +
-                '</div>';
         }).join('\n');
 
         this.el.innerHTML = elementsHTML;

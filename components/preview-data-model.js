@@ -106,6 +106,7 @@ var PreviewMetadataCollection = Backbone.Collection.extend({
 
             that.reset(variables);
             console.log('PreviewMetadataModel', '\nraw: ', d, '\nparsed: ', variables);
+            console.log(JSON.stringify(variables.map(function(d, i){ return d.key; }).sort()));
         });
     }
 });

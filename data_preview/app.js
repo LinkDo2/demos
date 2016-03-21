@@ -25,8 +25,13 @@ var previewMetadataCollection = new PreviewMetadataCollection({
 // Views
 var variableListView = new VariableListView({
     el: '.variable-container',
-    metadataCollection: previewMetadataCollection,
+    metadataCollection: metadataCollection,
     dataCollection: dataCollection
+});
+
+var variableListView = new PreviewVariableListView({
+    el: '.preview-variable-container',
+    metadataCollection: previewMetadataCollection
 });
 
 var mapView = new MapView({

@@ -61,6 +61,7 @@ var MetadataCollection = BaseCollection.extend({
         }
 
         console.log('MetadataCollection', '\nraw:', response, '\nparsed: ', variables);
+        console.log(JSON.stringify(variables.map(function(d, i){ return d.key; }).sort()));
 
         return variables;
     }

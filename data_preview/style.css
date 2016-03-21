@@ -1,11 +1,11 @@
 div, header, footer, nav {
     /*border: 1px solid silver;*/
 }
-
 body {
     font-family: Tahoma;
+    margin: 0;
+    padding: 0;
 }
-
 h1 {
     color: gray;
 }
@@ -33,6 +33,7 @@ h1 {
     flex: 1 6 100px;
     -webkit-order: 1;
     order: 1;
+    min-width: 300px;
 }
 #main > aside {
     padding: 25px;
@@ -50,13 +51,13 @@ header {
 }
 footer {
     min-height: 20px;
-    padding-top: 40px;
+    padding-top: 20px;
     text-align: center;
     color: silver;
 }
 .content-wrapper {
     max-width: 1000px;
-    margin: 0 auto;
+    margin: 20px auto;
 }
 @media all and (max-width: 640px) {
     #main, #page {
@@ -73,7 +74,6 @@ footer {
 
 .map-container {
     border: 1px silver solid;
-    margin: 20px;
 }
 .map .panel-background {
     display: none;
@@ -102,8 +102,18 @@ footer {
 
 /* navigation */
 
-nav ul {
-    list-style-type: none;
+header{
+    border-bottom: 1px solid silver;
+}
+nav {
+    height: 835px;
+    margin: 20px;
+    overflow: auto;
+    border: 1px solid silver;
+}
+nav .variable-element {
+    font-size: 0.8em;
+    padding: 12px 0;
 }
 
 /* variable list */
@@ -111,15 +121,16 @@ nav ul {
 .variable-wrapper {
     height: 400px;
     overflow: auto;
+    border: 1px solid silver;
 }
 .variable-container {
     padding: 20px 20px;
     width: 1000px;
     margin: 0 auto;
 }
-.variable-element {
+.variable-container .variable-element {
     padding: 10px;
 }
-.variable-element a {
+.variable-container .variable-element a {
     color: black;
 }
