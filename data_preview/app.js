@@ -1,9 +1,3 @@
-/*
-    TODO
-    -point data view
-    -point data interaction
-*/
-
 // Query Models
 var dataQueryModel = new DataQueryModel();
 var metadataQueryModel = new DataQueryModel();
