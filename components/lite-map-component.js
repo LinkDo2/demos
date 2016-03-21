@@ -201,7 +201,7 @@ var liteMap = function(){
             if(!(indexLat && rasterLat[indexLat])) return this;
 
             var rasterValue = rasterData[indexLat][indexLon];
-            var tooltipText = (rasterValue === config.nullValue || typeof rasterValue === 'undefined') ? '' : rasterValue + ' ' + config.unit;
+            var tooltipText = (rasterValue === config.nullValue || typeof rasterValue === 'undefined' || isNaN(rasterValue)) ? '' : rasterValue + ' ' + config.unit;
 
             tooltip.text(tooltipText)
                 .style({

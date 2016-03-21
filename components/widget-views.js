@@ -1,23 +1,32 @@
 var VariableListView = Backbone.View.extend({
 
-    events: {},
-
     initialize: function(options) {
         this.metadataCollection = options.metadataCollection;
+        this.dataCollection = options.dataCollection;
 
         this.listenTo(this.metadataCollection, 'reset', this.render);
+        this.listenTo(this.dataCollection, 'reset', this.renderData);
     },
 
     render: function(collection) {
-        var variableNames = collection.map(function(d) {
-            return d.get('longName');
-        });
-        var list = document.querySelector('.variables');
-        var listElementsHTML = variableNames.map(function(d) {
-            return '<li><a href="#' + d + '">' + d + '</a></li>';
+        var elementsHTML = this.metadataCollection.map(function(model) {
+            return '<div class="variable-element"><a href="#' + model.get('key') + '">' + model.get('longName') + '</a></div>';
         }).join('\n');
 
-        list.innerHTML = listElementsHTML;
+        this.el.innerHTML = elementsHTML;
+    },
+
+    renderData: function(collection) {
+        var elementsHTML = this.metadataCollection.map(function(model) {
+            var data = this.dataCollection.filter(function(d){ return d.get('key'); })[0];
+
+            return '<div class="variable-element">' +
+                '<a href="#' + model.get('key') + '">' + model.get('longName') + '</a>' +
+                '<div class="data">' + JSON.stringify(data.get('values')) + '</div>' +
+                '</div>';
+        }).join('\n');
+
+        this.el.innerHTML = elementsHTML;
     }
 });
 
@@ -45,20 +54,5 @@ var MapView = Backbone.View.extend({
                 nullValue: NaN
             })
             .render().renderRaster(data);
-    }
-});
-
-var MetadataView = Backbone.View.extend({
-
-    events: {},
-
-    initialize: function(options) {
-        // this.previewDataModel = options.previewDataModel;
-        //
-        // this.listenTo(this.previewDataModel, 'change', this.render);
-    },
-
-    render: function(model) {
-
     }
 });

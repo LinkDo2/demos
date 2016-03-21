@@ -1,8 +1,17 @@
 div, header, footer, nav {
-    border: 1px solid silver;
+    /*border: 1px solid silver;*/
+}
+
+body {
+    font-family: Tahoma;
+}
+
+h1 {
+    color: gray;
 }
 
 /* layout */
+
 #main {
     min-height: 800px;
     padding: 0px;
@@ -36,19 +45,19 @@ header, footer {
     display: block;
     padding: 5px;
 }
-
 header {
+    text-align: center;
 }
-
 footer {
     min-height: 20px;
+    padding-top: 40px;
+    text-align: center;
+    color: silver;
 }
-
 .content-wrapper {
     max-width: 1000px;
     margin: 0 auto;
 }
-
 @media all and (max-width: 640px) {
     #main, #page {
         -webkit-flex-flow: column;
@@ -61,21 +70,23 @@ footer {
 }
 
 /* map */
+
+.map-container {
+    border: 1px silver solid;
+    margin: 20px;
+}
 .map .panel-background {
     display: none;
 }
-
 .map .graticule, .equator {
     stroke: #eee;
     stroke-opacity: 0.1;
 }
-
 .map .country {
     fill: transparent;
     stroke: #eee;
     stroke-opacity: 0.2;
 }
-
 .map .polygon {
     fill: skyblue;
     fill-opacity: 0.3;
@@ -83,18 +94,32 @@ footer {
     stroke-width: 1px;
     stroke-opacity: 1;
 }
-
 .map .tooltip {
     fill: black;
     font-weight: bolder;
-    text-shadow:
-    -1px -1px 0 #fff,
-    1px -1px 0 #fff,
-    -1px 1px 0 #fff,
-    1px 1px 0 #fff;
+    text-shadow: -1px -1px 0 #fff, 1px -1px 0 #fff, -1px 1px 0 #fff, 1px 1px 0 #fff;
 }
 
 /* navigation */
+
 nav ul {
     list-style-type: none;
+}
+
+/* variable list */
+
+.variable-wrapper {
+    height: 400px;
+    overflow: auto;
+}
+.variable-container {
+    padding: 20px 20px;
+    width: 1000px;
+    margin: 0 auto;
+}
+.variable-element {
+    padding: 10px;
+}
+.variable-element a {
+    color: black;
 }

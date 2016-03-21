@@ -1,8 +1,6 @@
 /*
     TODO
-    -variable info view
     -point data view
-    -variable info interaction
     -point data interaction
 */
 
@@ -26,17 +24,19 @@ var previewDataModel = new PreviewDataModel({
     queryModel: dataPreviewQueryModel
 });
 
-var previewMetadataModel = new PreviewMetadataModel({
+var previewMetadataCollection = new PreviewMetadataCollection({
     queryModel: metadataPreviewQueryModel
 });
 
 // Views
 var variableListView = new VariableListView({
-    metadataCollection: previewMetadataModel
+    el: '.variable-container',
+    metadataCollection: previewMetadataCollection,
+    dataCollection: dataCollection
 });
 
 var mapView = new MapView({
-        el: document.querySelector('.container'),
+        el: document.querySelector('.map-container'),
         previewDataModel: previewDataModel
     })
     .on('click', function(d) {
@@ -46,11 +46,7 @@ var mapView = new MapView({
             context: 'reftime_time_lat_lon',
             count: 2
         });
-
-        var activeModel = metadataCollection.getActiveModel();
     });
-
-var MetadataView = new MetadataView({});
 
 // Fetch models
 metadataQueryModel.set({
@@ -93,8 +89,8 @@ dataPreviewQueryModel.set({
     path: 'path=/pub/data/nccf/com/gfs/prod/',
     datasetName: 'gfs.2016031706/gfs.t06z.sfluxgrbf252.grib2/',
     chunk: 'chunk=/1/0/preview',
-    // variableName: 'Maximum_temperature_height_above_ground_12_Hour_Interval',
-    variableName: 'Liquid_Volumetric_Soil_Moisture_non_Frozen_depth_below_surface_layer',
+    // variableName: 'Liquid_Volumetric_Soil_Moisture_non_Frozen_depth_below_surface_layer',
+    variableName: 'Maximum_temperature_height_above_ground_12_Hour_Interval',
     dimensionFilters: [
         [0, 1, 0],
         [0, 1, 0],
@@ -106,7 +102,7 @@ dataPreviewQueryModel.set({
 var variableDetailsNode = document.querySelector('.variable-details');
 window.addEventListener("hashchange", function() {
     var variableName = window.location.hash.replace('#', '');
-    var modelFromName = previewMetadataModel.filter(function(d){ return variableName === d.get('longName'); })[0];
+    var modelFromName = previewMetadataCollection.filter(function(d){ return variableName === d.get('key'); })[0];
 
     var dimensions = modelFromName.get('dimensions');
     var dimensionFilters = [];

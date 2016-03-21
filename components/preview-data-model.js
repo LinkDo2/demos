@@ -58,7 +58,7 @@ var PreviewDataModel = Backbone.Model.extend({
     }
 });
 
-var PreviewMetadataModel = Backbone.Collection.extend({
+var PreviewMetadataCollection = Backbone.Collection.extend({
 
     url: '',
 
