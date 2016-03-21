@@ -39,11 +39,16 @@ var mapView = new MapView({
         previewDataModel: previewDataModel
     })
     .on('click', function(d) {
+        metadataQueryModel.set({
+            lon: d[0],
+            lat: d[1],
+            apiKey: 'a7017583aeb944d2b8bfec81ff9a2363'
+        });
+
         dataQueryModel.set({
             lon: d[0],
             lat: d[1],
-            context: 'reftime_time_lat_lon',
-            count: 2
+            count: 10
         });
     });
 
@@ -66,8 +71,7 @@ dataQueryModel.set({
     lat: 0,
     apiKey: 'a7017583aeb944d2b8bfec81ff9a2363',
     isVerbose: false,
-    context: 'reftime_time1_lat_lon',
-    count: 3
+    count: 10
 });
 
 metadataPreviewQueryModel.set({
@@ -88,7 +92,6 @@ dataPreviewQueryModel.set({
     path: 'path=/pub/data/nccf/com/gfs/prod/',
     datasetName: 'gfs.2016031706/gfs.t06z.sfluxgrbf252.grib2/',
     chunk: 'chunk=/1/0/preview',
-    // variableName: 'Liquid_Volumetric_Soil_Moisture_non_Frozen_depth_below_surface_layer',
     variableName: 'Maximum_temperature_height_above_ground_12_Hour_Interval',
     dimensionFilters: [
         [0, 1, 0],

@@ -27,7 +27,7 @@ var DataCollection = BaseCollection.extend({
                 if(!dataObj[value]) {
                     dataObj[value] = [];
                 }
-                dataObj[value].push(values[value]);
+                dataObj[value].push({value: values[value], timestamp: new Date(response.entries[entry].axes.time)});
             }
         }
 
@@ -40,6 +40,7 @@ var DataCollection = BaseCollection.extend({
         }
 
         console.log('DataCollection', '\nraw: ', response, '\nparsed: ', data);
+        // console.log(JSON.stringify(data.map(function(d, i){ return d.key; }).sort()));
 
         return data;
     }

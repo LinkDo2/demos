@@ -14,6 +14,10 @@ var MetadataCollection = BaseCollection.extend({
 
     model: MetadataModel,
 
+    comparator: function(a, b) {
+        return (a.get('longName') >= b.get('longName')) ? 1 : -1;
+    },
+
     initialize: function(options) {
         this.queryModel = options.queryModel;
         this.listenTo(this.queryModel, 'change set', function() {
@@ -61,7 +65,7 @@ var MetadataCollection = BaseCollection.extend({
         }
 
         console.log('MetadataCollection', '\nraw:', response, '\nparsed: ', variables);
-        console.log(JSON.stringify(variables.map(function(d, i){ return d.key; }).sort()));
+        // console.log(JSON.stringify(variables.map(function(d, i){ return d.key; }).sort()));
 
         return variables;
     }
