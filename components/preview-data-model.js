@@ -64,6 +64,10 @@ var PreviewMetadataCollection = Backbone.Collection.extend({
 
     model: PreviewMetadataModel,
 
+    comparator: function(a, b) {
+        return (a.get('longName') >= b.get('longName')) ? 1 : -1;
+    },
+
     initialize: function(options) {
         this.queryModel = options.queryModel;
 
@@ -106,7 +110,7 @@ var PreviewMetadataCollection = Backbone.Collection.extend({
 
             that.reset(variables);
             console.log('PreviewMetadataModel', '\nraw: ', d, '\nparsed: ', variables);
-            console.log(JSON.stringify(variables.map(function(d, i){ return d.key; }).sort()));
+            // console.log(JSON.stringify(variables.map(function(d, i){ return d.key; }).sort()));
         });
     }
 });
