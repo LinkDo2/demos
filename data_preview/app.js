@@ -3,7 +3,6 @@
     -variable info view
     -point data view
     -variable info interaction
-    -variable preview change interaction
     -point data interaction
 */
 
@@ -33,7 +32,6 @@ var previewMetadataModel = new PreviewMetadataModel({
 
 // Views
 var variableListView = new VariableListView({
-    // metadataCollection: metadataCollection
     metadataCollection: previewMetadataModel
 });
 
@@ -108,23 +106,17 @@ dataPreviewQueryModel.set({
 var variableDetailsNode = document.querySelector('.variable-details');
 window.addEventListener("hashchange", function() {
     var variableName = window.location.hash.replace('#', '');
-    var variableDetails = variables[variableName];
-    var variableDetailsHTML = '<ul>';
-    for(var detail in variableDetails) {
-        variableDetailsHTML += '<li>' + detail + ': ' + JSON.stringify(variableDetails[detail]) + '</li>'
-    }
-    variableDetailsHTML += '</ul>';
-    variableDetailsNode.innerHTML = variableDetailsHTML;
+    var modelFromName = previewMetadataModel.filter(function(d){ return variableName === d.get('longName'); })[0];
 
-    var dimensions = variableDetails.dimensions;
+    var dimensions = modelFromName.get('dimensions');
     var dimensionFilters = [];
     for(var dimension in dimensions) {
-        var max = (dimension === 'lat' || dimension === 'lon') ? dimensions[dimension] - 1 : 0;
+        var max = (dimension === 'lat' || dimension === 'lon') ? dimensions[dimension] - 1: 0;
         dimensionFilters.push([0, 1, max]);
     }
-    var dataPreviewDods = threddsURL + '.dods?' + variableName + dimensionFilters.map(function(d) {
-        return '[' + d.join(':') + ']';
-    }).join('') + ',time1';
 
-    console.log('query from hash', dataPreviewDods);
+    dataPreviewQueryModel.set({
+        variableName: modelFromName.get('key'),
+        dimensionFilters: dimensionFilters
+    });
 });
