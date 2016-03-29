@@ -10,9 +10,9 @@ var DataCollection = BaseCollection.extend({
     model: DataModel,
 
     initialize: function(options) {
-        this.queryModel = options.queryModel;
+        this.pointQueryModel = options.pointQueryModel;
 
-        this.listenTo(this.queryModel, 'change', function() {
+        this.listenTo(this.pointQueryModel, 'change', function() {
             this.fetch({
                 reset: true
             });

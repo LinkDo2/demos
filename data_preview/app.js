@@ -1,37 +1,37 @@
 // Query Models
-var dataQueryModel = new DataQueryModel();
-var metadataQueryModel = new DataQueryModel();
-var dataPreviewQueryModel = new DataPreviewQueryModel();
-var metadataPreviewQueryModel = new DataPreviewQueryModel();
+var pointDataQueryModel = new PointDataQueryModel();
+var pointMetadataQueryModel = new PointDataQueryModel();
+var opendapDataQueryModel = new OpendapDataPreviewQueryModel();
+var opendapMetadataQueryModel = new OpendapDataPreviewQueryModel();
 
-var metadataCollection = new MetadataCollection({
-    queryModel: metadataQueryModel,
-    dataPreviewQueryModel: dataPreviewQueryModel
+var pointMetadataCollection = new PointMetadataCollection({
+    pointQueryModel: pointMetadataQueryModel,
+    opendapDataQueryModel: opendapDataQueryModel
 });
 
 // Data models
-var dataCollection = new DataCollection({
-    queryModel: dataQueryModel
+var pointDataCollection = new DataCollection({
+    pointQueryModel: pointDataQueryModel
 });
 
 var previewDataModel = new PreviewDataModel({
-    queryModel: dataPreviewQueryModel
+    opendapDataQueryModel: opendapDataQueryModel
 });
 
-var previewMetadataCollection = new PreviewMetadataCollection({
-    queryModel: metadataPreviewQueryModel
+var opendapMetadataCollection = new OpendapMetadataCollection({
+    opendapMetadataQueryModel: opendapMetadataQueryModel
 });
 
 // Views
-var variableListView = new VariableListView({
+var pointVariableListView = new PointVariableListView({
     el: '.variable-container',
-    metadataCollection: metadataCollection,
-    dataCollection: dataCollection
+    pointMetadataCollection: pointMetadataCollection,
+    pointDataCollection: pointDataCollection
 });
 
-var variableListView = new PreviewVariableListView({
+var opendapVariableListView = new OpendapVariableListView({
     el: '.preview-variable-container',
-    metadataCollection: previewMetadataCollection
+    opendapMetadataCollection: opendapMetadataCollection
 });
 
 var mapView = new MapView({
@@ -39,13 +39,13 @@ var mapView = new MapView({
         previewDataModel: previewDataModel
     })
     .on('click', function(d) {
-        metadataQueryModel.set({
+        pointMetadataQueryModel.set({
             lon: d[0],
             lat: d[1],
             apiKey: 'a7017583aeb944d2b8bfec81ff9a2363'
         });
 
-        dataQueryModel.set({
+        pointDataQueryModel.set({
             lon: d[0],
             lat: d[1],
             count: 10
@@ -53,7 +53,7 @@ var mapView = new MapView({
     });
 
 // Fetch models
-metadataQueryModel.set({
+pointMetadataQueryModel.set({
     baseURL: 'http://api.planetos.com/v1/datasets/',
     datasetName: 'noaa_gfs_global_sflux_0.12d',
     lon: 0,
@@ -64,7 +64,7 @@ metadataQueryModel.set({
     count: null
 });
 
-dataQueryModel.set({
+pointDataQueryModel.set({
     baseURL: 'http://api.planetos.com/v1/datasets/',
     datasetName: 'noaa_gfs_global_sflux_0.12d',
     lon: 0,
@@ -74,37 +74,25 @@ dataQueryModel.set({
     count: 10
 });
 
-metadataPreviewQueryModel.set({
-    threddsURL: 'http://thredds.planetos.com/thredds/dodsC/dpipe//',
-    releaseVersion: 'rel_0_6x11_dataset/transform/',
-    scheme: 'scheme=/ftp/',
-    authority: 'authority=/ftp.ncep.noaa.gov/',
-    path: 'path=/pub/data/nccf/com/gfs/prod/',
-    datasetName: 'gfs.2016031706/gfs.t06z.sfluxgrbf252.grib2/',
-    chunk: 'chunk=/1/0/preview'
+opendapMetadataQueryModel.set({
+    threddsURL: 'http://thredds.planetos.com/thredds/dodsC/dpipe//rel_0_6x11_dataset/transform/scheme=/ftp/authority=/ftp.ncep.noaa.gov/path=/pub/data/nccf/com/gfs/prod/gfs.2016032912/gfs.t12z.sfluxgrbf00.grib2/chunk=/1/0/preview'
 });
 
-dataPreviewQueryModel.set({
-    threddsURL: 'http://thredds.planetos.com/thredds/dodsC/dpipe//',
-    releaseVersion: 'rel_0_6x11_dataset/transform/',
-    scheme: 'scheme=/ftp/',
-    authority: 'authority=/ftp.ncep.noaa.gov/',
-    path: 'path=/pub/data/nccf/com/gfs/prod/',
-    datasetName: 'gfs.2016031706/gfs.t06z.sfluxgrbf252.grib2/',
-    chunk: 'chunk=/1/0/preview',
-    variableName: 'Maximum_temperature_height_above_ground_12_Hour_Interval',
+opendapDataQueryModel.set({
+    threddsURL: 'http://thredds.planetos.com/thredds/dodsC/dpipe//rel_0_6x11_dataset/transform/scheme=/ftp/authority=/ftp.ncep.noaa.gov/path=/pub/data/nccf/com/gfs/prod/gfs.2016032912/gfs.t12z.sfluxgrbf00.grib2/chunk=/1/0/preview',
+    variableName: 'Geopotential_height_hybrid',
     dimensionFilters: [
         [0, 1, 0],
         [0, 1, 0],
-        [0, 1, 287],
-        [0, 1, 575]
+        [0, 1, 383],
+        [0, 1, 767]
     ]
 });
 
 var variableDetailsNode = document.querySelector('.variable-details');
 window.addEventListener("hashchange", function() {
     var variableName = window.location.hash.replace('#', '');
-    var modelFromName = previewMetadataCollection.filter(function(d){ return variableName === d.get('key'); })[0];
+    var modelFromName = opendapMetadataCollection.filter(function(d){ return variableName === d.get('key'); })[0];
 
     var dimensions = modelFromName.get('dimensions');
     var dimensionFilters = [];
@@ -113,7 +101,7 @@ window.addEventListener("hashchange", function() {
         dimensionFilters.push([0, 1, max]);
     }
 
-    dataPreviewQueryModel.set({
+    opendapDataQueryModel.set({
         variableName: modelFromName.get('key'),
         dimensionFilters: dimensionFilters
     });
