@@ -22,18 +22,21 @@ var PreviewDataModel = Backbone.Model.extend({
     },
 
     initialize: function(options) {
-        this.queryModel = options.queryModel;
+        this.opendapDataQueryModel = options.opendapDataQueryModel;
 
-        this.listenTo(this.queryModel, 'change', function(){ this.fetch({reset: true}); });
+        this.listenTo(this.opendapDataQueryModel, 'change', function(){ this.fetch({reset: true}); });
     },
 
     fetch: function(){
         var that = this;
-        var q = this.queryModel.toJSON();
+        var q = this.opendapDataQueryModel.toJSON();
 
-        var dataPreviewDods = q.threddsURL + q.releaseVersion + q.scheme + q.authority + q.path + q.datasetName + q.chunk + '.dods?' + q.variableName + q.dimensionFilters.map(function(d) {
+        var dataPreviewDods = q.threddsURL + '.dods?' + q.variableName + q.dimensionFilters.map(function(d) {
             return '[' + d.join(':') + ']';
-        }).join('') + ',time1';
+        }).join('')
+        if(q.contexts) {
+            dataPreviewDods += ',' + contexts.join();
+        }
 
         console.log('Preview data query', dataPreviewDods);
 
@@ -58,7 +61,7 @@ var PreviewDataModel = Backbone.Model.extend({
     }
 });
 
-var PreviewMetadataCollection = Backbone.Collection.extend({
+var OpendapMetadataCollection = Backbone.Collection.extend({
 
     url: '',
 
@@ -69,20 +72,20 @@ var PreviewMetadataCollection = Backbone.Collection.extend({
     },
 
     initialize: function(options) {
-        this.queryModel = options.queryModel;
+        this.opendapMetadataQueryModel = options.opendapMetadataQueryModel;
 
-        this.listenTo(this.queryModel, 'change', function(){ this.fetch({reset: true}); });
+        this.listenTo(this.opendapMetadataQueryModel, 'change', function(){ this.fetch({reset: true}); });
     },
 
     fetch: function(){
         var that = this;
-        var q = this.queryModel.toJSON();
+        var q = this.opendapMetadataQueryModel.toJSON();
 
-        var dataPreviewDods = q.threddsURL + q.releaseVersion + q.scheme + q.authority + q.path + q.datasetName + q.chunk;
+        var dataPreviewURL = q.threddsURL;
 
-        console.log('Preview data query', dataPreviewDods);
+        console.log('Preview data query', dataPreviewURL);
 
-        jsdap.loadDataset(dataPreviewDods, function(d) {
+        jsdap.loadDataset(dataPreviewURL, function(d) {
             var variables = [];
             for(var dB in d) {
                 var value = d[dB];

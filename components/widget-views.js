@@ -1,16 +1,16 @@
-var VariableListView = Backbone.View.extend({
+var PointVariableListView = Backbone.View.extend({
 
     initialize: function(options) {
-        this.metadataCollection = options.metadataCollection;
-        this.dataCollection = options.dataCollection;
+        this.pointMetadataCollection = options.pointMetadataCollection;
+        this.pointDataCollection = options.pointDataCollection;
 
-        this.listenTo(this.metadataCollection, 'reset', this.render);
-        this.listenTo(this.dataCollection, 'reset', this.render);
+        this.listenTo(this.pointMetadataCollection, 'reset', this.render);
+        this.listenTo(this.pointDataCollection, 'reset', this.render);
     },
 
     render: function(collection) {
-        var elementsHTML = this.metadataCollection.map(function(model) {
-            var data = this.dataCollection.filter(function(d) {
+        var elementsHTML = this.pointMetadataCollection.map(function(model) {
+            var data = this.pointDataCollection.filter(function(d) {
                 return d.get('key') === model.get('key');
             })[0];
 
@@ -28,16 +28,16 @@ var VariableListView = Backbone.View.extend({
     }
 });
 
-var PreviewVariableListView = Backbone.View.extend({
+var OpendapVariableListView = Backbone.View.extend({
 
     initialize: function(options) {
-        this.metadataCollection = options.metadataCollection;
+        this.opendapMetadataCollection = options.opendapMetadataCollection;
 
-        this.listenTo(this.metadataCollection, 'reset', this.render);
+        this.listenTo(this.opendapMetadataCollection, 'reset', this.render);
     },
 
     render: function(collection) {
-        var elementsHTML = this.metadataCollection.map(function(model) {
+        var elementsHTML = this.opendapMetadataCollection.map(function(model) {
             return '<div class="variable-element"><a href="#' + model.get('key') + '">' + model.get('longName') + '</a></div>';
         }).join('\n');
 
@@ -46,6 +46,34 @@ var PreviewVariableListView = Backbone.View.extend({
 });
 
 var MapView = Backbone.View.extend({
+
+    initialize: function(options) {
+        var that = this;
+        this.previewDataModel = options.previewDataModel;
+
+        this.map = liteMap()
+            .config({
+                el: this.el,
+                colorScale: colorBrewer.equalize(colorBrewer.Spectral[11])
+            })
+            .on('click', function(d) {
+                that.trigger('click', d);
+            });
+
+        this.listenTo(this.previewDataModel, 'change', this.render);
+    },
+
+    render: function(model) {
+        var data = model.toJSON();
+        this.map.config({
+                nullValue: NaN
+            })
+            .render().renderRaster(data);
+    }
+});
+
+//TODO
+var ChartView = Backbone.View.extend({
 
     initialize: function(options) {
         var that = this;

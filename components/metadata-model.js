@@ -10,7 +10,7 @@ var MetadataModel = Backbone.Model.extend({
     }
 });
 
-var MetadataCollection = BaseCollection.extend({
+var PointMetadataCollection = BaseCollection.extend({
 
     model: MetadataModel,
 
@@ -19,16 +19,16 @@ var MetadataCollection = BaseCollection.extend({
     },
 
     initialize: function(options) {
-        this.queryModel = options.queryModel;
-        this.listenTo(this.queryModel, 'change set', function() {
+        this.pointQueryModel = options.pointQueryModel;
+        this.listenTo(this.pointQueryModel, 'change set', function() {
             this.fetch({
                 reset: true
             });
         });
 
-        this.dataPreviewQueryModel = options.dataPreviewQueryModel;
+        this.opendapDataQueryModel = options.opendapDataQueryModel;
         this.activeVariableName = null;
-        this.listenTo(this.dataPreviewQueryModel, 'change:variableName', function(model, variableName) {
+        this.listenTo(this.opendapDataQueryModel, 'change:variableName', function(model, variableName) {
             this.activeVariableName = variableName;
         });
     },
@@ -64,7 +64,7 @@ var MetadataCollection = BaseCollection.extend({
             }
         }
 
-        console.log('MetadataCollection', '\nraw:', response, '\nparsed: ', variables);
+        console.log('PointMetadataCollection', '\nraw:', response, '\nparsed: ', variables);
         // console.log(JSON.stringify(variables.map(function(d, i){ return d.key; }).sort()));
 
         return variables;
