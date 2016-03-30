@@ -216,13 +216,6 @@ var liteMap = function(){
             tooltip.style({
                     display: 'none'
                 });
-        })
-        .on('click', function(){
-            var mouse = d3.mouse(this);
-            var projectedCoordinates = projection.invert(mouse);
-            var coordX = ((projectedCoordinates[0] + 360) % 360);
-            var coordY = projectedCoordinates[1];
-            events.click(projectedCoordinates);
         });
 
         var ctx = canvasNode.getContext('2d');
@@ -340,7 +333,19 @@ var liteMap = function(){
             .data([0]);
 
         canvas.enter().append('canvas')
-            .style({position: 'absolute'});
+            .style({position: 'absolute'})
+            .attr({
+                width: width,
+                height: height
+            })
+            .on('click', function(){
+                console.log(1);
+                var mouse = d3.mouse(this);
+                var projectedCoordinates = projection.invert(mouse);
+                var coordX = ((projectedCoordinates[0] + 360) % 360);
+                var coordY = projectedCoordinates[1];
+                events.click(projectedCoordinates);
+            });
 
         svg = d3.select(panelNode).selectAll('svg')
             .data([0]);
