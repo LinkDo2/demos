@@ -90,29 +90,19 @@ var MapView = Backbone.View.extend({
     }
 });
 
-//TODO
 var ChartView = Backbone.View.extend({
 
-    initialize: function(options) {
-        var that = this;
+    render: function(model) {
+        var data = model.toJSON();
+        var chartData = data.values.map(function(d, i){ return d.value; });
+
         var config = {
             container: this.el,
-            type: 'line',
-            subtype: 'area',
-            scaleType: 'time',
-            tickYCount: 3,
-            labelFormatterX: function(d){ return d3.time.format('%X')(new Date(d)); },
-            labelFormatterY: d3.format('.2s'),
-            margin: {top: 20, right: 100, bottom: 50, left: 50},
-        };
-        this.chart = cirrus.init(config);
-    },
-
-    render: function(model) {
-        var chartData = [];
-        var data = model.toJSON();
-        chartData.push({name: data.key, values: data.values.map(function(d, i){ return {x: d.timestamp, y: d.value}; })});
-
-        this.chart.render(chartData);
+            width: 800,
+            height: 120,
+            margin: {top: 10, right: 40, bottom: 40, left: 60},
+            data: chartData
+        }
+        this.chart = piper.areaChart(config);
     }
 });

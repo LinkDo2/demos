@@ -130,13 +130,48 @@ header{
 
 /* charts */
 
-.chart-container {
-    height: 100px;
+.piper-chart {
+    font-size: 9px;
 }
-.chart {
-    position: relative!important;
-    font-size: 10px;
+
+.piper-chart .hover-line {
+    background-color: black;
 }
-.chart .grid-line-x {
-    background-color: silver!important;
+
+.piper-chart .tooltip {
+    font-size: 8px;
+    background-color: white;
+    border: 1px solid white;
+    opacity: 1;
+    margin-left: 2px;
+    padding: 3px;
+    border-radius: 0px 10px 10px 10px;
+}
+
+.piper-chart .shape {
+    fill: #FBC65A;
+    fill-opacity: 0.3;
+    stroke: #FBC65A;
+    stroke-width: 1px;
+}
+
+.piper-chart .grid-line-x {
+    background-color: silver;
+}
+
+.piper-chart .axis-y {
+    border: none;
+}
+
+.piper-chart .domain {
+    fill: none;
+    stroke: black;
+}
+
+.piper-chart .tick line {
+    stroke: black;
+}
+
+.piper-chart .tooltip-line {
+    stroke: silver;
 }
