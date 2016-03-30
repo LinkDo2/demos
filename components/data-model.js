@@ -5,7 +5,7 @@ var DataModel = Backbone.Model.extend({
     }
 });
 
-var DataCollection = BaseCollection.extend({
+var PointDataCollection = BaseCollection.extend({
 
     model: DataModel,
 
@@ -39,7 +39,7 @@ var DataCollection = BaseCollection.extend({
             });
         }
 
-        console.log('DataCollection', '\nraw: ', response, '\nparsed: ', data);
+        console.log('PointDataCollection', '\nraw: ', response, '\nparsed: ', data);
         // console.log(JSON.stringify(data.map(function(d, i){ return d.key; }).sort()));
 
         return data;

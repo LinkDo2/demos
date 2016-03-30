@@ -15,7 +15,7 @@ var BaseCollection = Backbone.Collection.extend({
             url += '&count=' + q.count;
         }
 
-        console.log('Data query', url);
+        console.log('Point data query', url);
         return url;
     }
 });

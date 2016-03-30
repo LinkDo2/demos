@@ -10,7 +10,7 @@ var pointMetadataCollection = new PointMetadataCollection({
 });
 
 // Data models
-var pointDataCollection = new DataCollection({
+var pointDataCollection = new PointDataCollection({
     pointQueryModel: pointDataQueryModel
 });
 

@@ -18,6 +18,9 @@ cirrus.init = function(initialConfig) {
         labelFormatterX: function(d) {
             return d;
         },
+        labelFormatterY: function(d) {
+            return d;
+        },
         tooltipFormatter: function(d) {
             return d.data.y;
         },
@@ -650,7 +653,7 @@ cirrus.layout.axes.y = function(config) {
     return d3.range(config.tickYCount).map(function(d, i) {
         var value = i * domainMax / (config.tickYCount - 1);
         return {
-            label: value,
+            label: config.labelFormatterY(value),
             stackedLabel: i * stackedDomainMax / (config.tickYCount - 1),
             labelY: scaleY(value)
         };
@@ -1249,7 +1252,7 @@ cirrus.component.axisY = function(config) {
     var labelsY = axisYContainer.selectAll("div.label").data(config.axesLayout.y);
     labelsY.enter().append("div").classed("label", true);
     labelsY.html(function(d, i) {
-        if (config.subtype === "simple" || config.subtype === "grid") {
+        if (config.subtype === "simple" || config.subtype === "grid" || config.subtype === "area") {
             return d.label;
         } else {
             return d.stackedLabel;
