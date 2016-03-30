@@ -26,18 +26,18 @@ var PointMetadataCollection = BaseCollection.extend({
             });
         });
 
-        this.opendapDataQueryModel = options.opendapDataQueryModel;
-        this.activeVariableName = null;
-        this.listenTo(this.opendapDataQueryModel, 'change:variableName', function(model, variableName) {
-            this.activeVariableName = variableName;
-        });
+        // this.opendapDataQueryModel = options.opendapDataQueryModel;
+        // this.activeVariableName = null;
+        // this.listenTo(this.opendapDataQueryModel, 'change:variableName', function(model, variableName) {
+        //     this.activeVariableName = variableName;
+        // });
     },
 
-    getActiveModel: function(){
-        var that = this;
-        var activeModel = this.filter(function(d){ return d.get('key') === that.activeVariableName; })[0];
-        return activeModel;
-    },
+    // getActiveModel: function(){
+    //     var that = this;
+    //     var activeModel = this.filter(function(d){ return d.get('key') === that.activeVariableName; })[0];
+    //     return activeModel;
+    // },
 
     parse: function(response) {
         var contexts = response.metadata.contexts;
