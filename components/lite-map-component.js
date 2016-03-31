@@ -88,11 +88,11 @@ var liteMap = function(){
         var polygonData = (config.windingCheck) ? geojsonRewind(_polygonData[0]) : _polygonData[0];
 
         if(!polygonData || !(polygonData && polygonData.geometry && polygonData.geometry.type)){
-            console.warn('Polygon data is invalid', _polygonData);
+            console.warn('Polygon data is invalid', _polygonData, polygonData);
             return this;
         }
 
-        console.log(JSON.stringify(polygonData));
+        // console.log(JSON.stringify(polygonData));
 
         polygon.datum(polygonData)
             .filter(function(d){
@@ -116,14 +116,12 @@ var liteMap = function(){
 
         polygon.datum(polygonData)
             .filter(function(d){
-                var bounds = path.bounds(d);
                 var size =  Math.sqrt(path.area(d));
                 return size < 10;
             })
             .attr({
                 d: function(d){
                     var centroid = path.centroid(d);
-                    var size = 20;
                     return 'm '+centroid[0]+','+centroid[1]+' c 0,0 0,-0.5 -3.5,-4 -1,-1 -2.5,-2.6 -2.5,-4 0,-4 6,-4 6,-4 0,0 6,0 6,4 0,1.4 -1.5,3 -2.5,4 -3.5,3.5 -3.5,4 -3.5,4 z';
                 },
                 fill: polygonData.properties && polygonData.properties.autoColor ? polygonData.properties.autoColor : 'skyblue'
@@ -339,7 +337,6 @@ var liteMap = function(){
                 height: height
             })
             .on('click', function(){
-                console.log(1);
                 var mouse = d3.mouse(this);
                 var projectedCoordinates = projection.invert(mouse);
                 var coordX = ((projectedCoordinates[0] + 360) % 360);

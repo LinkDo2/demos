@@ -34,6 +34,11 @@ var mapView = new MapView({
         });
     });
 
+var infoView = new InfoView({
+    el: document.querySelector('.info-container'),
+    pointDataCollection: pointDataCollection
+});
+
 // Fetch models
 pointMetadataQueryModel.set({
     baseURL: 'http://api.planetos.com/v1/datasets/',
