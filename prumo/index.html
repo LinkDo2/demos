@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<head>
+    <meta charset="utf-8">
+    <script src="http://d3js.org/d3.v3.min.js"></script>
+    <script src="piper.js"></script>
+    <link rel="stylesheet" href="app-style.css" charset="utf-8">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/semantic-ui/2.1.8/semantic.min.css" charset="utf-8">
+    <style>
+    .view {
+        display: none;
+    }
+    .view.active {
+        display: block;
+    }
+    </style>
+</head>
+<body class="prumo-app">
+
+    <div class="top-menu ui secondary pointing menu">
+        <a id="hse" class="active item">
+        HSE
+        </a>
+        <a id="operations" class="item">
+        OPERATIONS
+        </a>
+        <a id="engineering" class="item disabled">
+        ENGINEERING
+        </a>
+        <a id="director_board" class="item disabled">
+        DIRECTOR'S BOARD
+        </a>
+        <a id="env_agency" class="item">
+        ENV AGENCY
+        </a>
+    </div>
+
+    <div class="env_agency aguas prumo-water view">
+
+        <div class="submenu">
+            <div class="hse-data-menu ui compact menu">
+                <div class="ui basic label">Data</div>
+                <div class="ui simple dropdown item">
+                    Águas superficiais Marinhas<i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a class="item" id="aguas">Águas superficiais Marinhas</a>
+                        <a class="item" id="air">Air quality</a>
+                        <a class="item" id="sediment">Marine Sediment</a>
+                        <a class="item" id="metocean">Metocean</a>
+                        <a class="item disabled" id="weather">Weather Forecast</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui compact menu">
+                <div class="ui basic label">Location</div>
+                <div class="ui simple dropdown disabled item">
+                    Pasb-01<i class="dropdown icon"></i>
+                </div>
+            </div>
+
+            <div class="menu-right">
+                <div class="ui compact menu">
+                    <div class="ui basic label">Start</div>
+                    <div class="ui simple dropdown disabled item">
+                        Jan 1, 2016<i class="dropdown icon"></i>
+                    </div>
+                </div>
+                <div class="ui compact menu">
+                    <div class="ui basic label">End</div>
+                    <div class="ui simple dropdown disabled item">
+                        Mars 31, 2016<i class="dropdown icon"></i>
+                    </div>
+                </div>
+
+                <div class="print ui large basic button">Print PDF</div>
+            </div>
+        </div>
+
+
+        <div class="map">
+            <img src="img/env_agency_map_water.png"></img>
+        </div>
+
+        <div class="title">
+            <div class="name">TS - Águas superficiais Marinhas </div>
+            <div class="detail">Pasb-01</div>
+        </div>
+
+        <div class="charts-container">
+            <div class="tooltip"></div>
+        </div>
+
+    </div>
+
+    <div class="env_agency air prumo-air view">
+
+        <div class="submenu">
+            <div class="hse-data-menu ui compact menu">
+                <div class="ui basic label">Data</div>
+                <div class="ui simple dropdown item">
+                    Air quality<i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a class="item" id="aguas">Águas superficiais Marinhas</a>
+                        <a class="item" id="air">Air quality</a>
+                        <a class="item" id="sediment">Marine Sediment</a>
+                        <a class="item" id="metocean">Metocean</a>
+                        <a class="item disabled" id="weather">Weather Forecast</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="ui compact menu">
+                <div class="ui basic label">Location</div>
+                <div class="ui simple dropdown disabled item">
+                    Aqua Preta<i class="dropdown icon"></i>
+                </div>
+            </div>
+
+            <div class="menu-right">
+                <div class="ui compact menu">
+                    <div class="ui simple dropdown disabled item">
+                        January 2016<i class="dropdown icon"></i>
+                    </div>
+                </div>
+
+                <div class="print ui large basic button">Print PDF</div>
+            </div>
+        </div>
+
+
+        <div class="map">
+            <img src="img/env_agency_map_air.png"></img>
+        </div>
+
+        <div class="title">
+            <div class="name">Air Quality</div>
+            <div class="detail">Aqua Preta</div>
+        </div>
+
+        <div class="charts-container">
+            <div class="tooltip"></div>
+        </div>
+
+    </div>
+
+    <div class="env_agency sediment prumo-sediment view">
+
+        <div class="submenu">
+            <div class="hse-data-menu ui compact menu">
+                <div class="ui basic label">Data</div>
+                <div class="ui simple dropdown item">
+                    Marine Sediment<i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a class="item" id="aguas">Águas superficiais Marinhas</a>
+                        <a class="item" id="air">Air quality</a>
+                        <a class="item" id="sediment">Marine Sediment</a>
+                        <a class="item" id="metocean">Metocean</a>
+                        <a class="item disabled" id="weather">Weather Forecast</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-right">
+                <div class="ui compact menu">
+                    <div class="ui simple dropdown disabled item">
+                        February 2015<i class="dropdown icon"></i>
+                    </div>
+                </div>
+
+                <div class="print ui large basic button">Print PDF</div>
+            </div>
+        </div>
+
+        <div class="map">
+            <img src="img/env_agency_map_sediment.png"></img>
+        </div>
+
+        <div class="charts-container">
+            <div class="tooltip"></div>
+        </div>
+
+    </div>
+
+    <div class="hse hse-overview view active">
+        
+        <div class="submenu">
+            <div class="hse-data-menu ui compact menu">
+                <div class="ui basic label">Data</div>
+                <div class="ui simple dropdown item">
+                    Overview Dashboard<i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a class="item" id="hse-overview">Overview Dashboard</a>
+                        <a class="item" id="hse-vessel">Vessel AIS Data</a>
+                        <a class="item disabled" id="aguas">Águas superficiais Marinhas</a>
+                        <a class="item disabled" id="air">Air quality</a>
+                        <a class="item disabled" id="sediment">Marine Sediment</a>
+                        <a class="item disabled" id="metocean">Metocean</a>
+                        <a class="item disabled" id="weather">Weather Forecast</a>
+                        <a class="item disabled">Solid waste</a>
+                        <a class="item disabled">Waste Water</a>
+                        <a class="item disabled">Groundwater</a>
+                        <a class="item disabled">Sea Turtles</a>
+                        <a class="item disabled">Drinking Water</a>
+                        <a class="item disabled">Sea Water</a>
+                        <a class="item disabled">Sediment Dynamics and Coastal Erosion</a>
+                        <a class="item disabled">Marine Biotic</a>
+                        <a class="item disabled">Acoustic Noise</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-right">
+                <div class="date">
+                    2016.02.23 at 13:45:45 UTC
+                </div>
+
+                <div class="print ui large basic button">Print PDF</div>
+            </div>
+        </div>
+
+
+        <div class="map">
+            <img src="img/hse_overview.png"></img>
+        </div>
+
+        <div class="charts-container">
+            <div class="tooltip"></div>
+        </div>
+
+    </div>
+
+    <div class="hse hse-vessel view">
+        
+        <div class="submenu">
+            <div class="hse-data-menu ui compact menu">
+                <div class="ui basic label">Data</div>
+                <div class="ui simple dropdown item">
+                    Vessel AIS Data<i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a class="item" id="hse-overview">Overview Dashboard</a>
+                        <a class="item" id="hse-vessel">Vessel AIS Data</a>
+                        <a class="item disabled" id="aguas">Águas superficiais Marinhas</a>
+                        <a class="item disabled" id="air">Air quality</a>
+                        <a class="item disabled" id="sediment">Marine Sediment</a>
+                        <a class="item disabled" id="metocean">Metocean</a>
+                        <a class="item disabled" id="weather">Weather Forecast</a>
+                        <a class="item disabled">Solid waste</a>
+                        <a class="item disabled">Waste Water</a>
+                        <a class="item disabled">Groundwater</a>
+                        <a class="item disabled">Sea Turtles</a>
+                        <a class="item disabled">Drinking Water</a>
+                        <a class="item disabled">Sea Water</a>
+                        <a class="item disabled">Sediment Dynamics and Coastal Erosion</a>
+                        <a class="item disabled">Marine Biotic</a>
+                        <a class="item disabled">Acoustic Noise</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-right">
+                <div class="date">
+                    South Atlantic Ocean, BR 12:32 (UTC -2)
+                </div>
+
+                <div class="live ui compact menu">
+                    <div class="ui simple dropdown disabled item">
+                        Live<i class="dropdown icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="map">
+            <img src="img/hse_vessel.png"></img>
+        </div>
+
+        <div class="charts-container">
+            <div class="tooltip"></div>
+        </div>
+
+    </div>
+
+    <div class="operations operations-overview view">
+        
+        <div class="submenu">
+            <div class="hse-data-menu ui compact menu">
+                <div class="ui basic label">Data</div>
+                <div class="ui simple dropdown item">
+                    Overview Dashboard<i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a class="item" id="operations-overview">Overview Dashboard</a>
+                        <a class="item" id="operations-vessel">Vessel AIS Data</a>
+                        <a class="item disabled" id="aguas">Águas superficiais Marinhas</a>
+                        <a class="item disabled" id="air">Air quality</a>
+                        <a class="item disabled" id="sediment">Marine Sediment</a>
+                        <a class="item disabled" id="metocean">Metocean</a>
+                        <a class="item disabled" id="weather">Weather Forecast</a>
+                        <a class="item disabled">Solid waste</a>
+                        <a class="item disabled">Waste Water</a>
+                        <a class="item disabled">Groundwater</a>
+                        <a class="item disabled">Sea Turtles</a>
+                        <a class="item disabled">Drinking Water</a>
+                        <a class="item disabled">Sea Water</a>
+                        <a class="item disabled">Sediment Dynamics and Coastal Erosion</a>
+                        <a class="item disabled">Marine Biotic</a>
+                        <a class="item disabled">Acoustic Noise</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-right">
+                <div class="date">
+                    2016.02.23 at 13:45:45 UTC
+                </div>
+
+                <div class="print ui large basic button">Print PDF</div>
+            </div>
+        </div>
+
+
+        <div class="map">
+            <img src="img/operator_overview.png"></img>
+        </div>
+
+        <div class="charts-container">
+            <div class="tooltip"></div>
+        </div>
+
+    </div>
+
+    <div class="operations operations-vessel view">
+        
+        <div class="submenu">
+            <div class="hse-data-menu ui compact menu">
+                <div class="ui basic label">Data</div>
+                <div class="ui simple dropdown item">
+                    Vessel AIS Data<i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a class="item" id="operations-overview">Overview Dashboard</a>
+                        <a class="item" id="operations-vessel">Vessel AIS Data</a>
+                        <a class="item disabled" id="aguas">Águas superficiais Marinhas</a>
+                        <a class="item disabled" id="air">Air quality</a>
+                        <a class="item disabled" id="sediment">Marine Sediment</a>
+                        <a class="item disabled" id="metocean">Metocean</a>
+                        <a class="item disabled" id="weather">Weather Forecast</a>
+                        <a class="item disabled">Solid waste</a>
+                        <a class="item disabled">Waste Water</a>
+                        <a class="item disabled">Groundwater</a>
+                        <a class="item disabled">Sea Turtles</a>
+                        <a class="item disabled">Drinking Water</a>
+                        <a class="item disabled">Sea Water</a>
+                        <a class="item disabled">Sediment Dynamics and Coastal Erosion</a>
+                        <a class="item disabled">Marine Biotic</a>
+                        <a class="item disabled">Acoustic Noise</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-right">
+                <div class="date">
+                    South Atlantic Ocean, BR 12:32 (UTC -2)
+                </div>
+
+                <div class="live ui compact menu">
+                    <div class="ui simple dropdown disabled item">
+                        Live<i class="dropdown icon"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="map">
+            <img src="img/hse_vessel.png"></img>
+        </div>
+
+        <div class="charts-container">
+            <div class="tooltip"></div>
+        </div>
+
+    </div>
+
+    <div class="env_agency metocean view">
+
+        <div class="submenu">
+            <div class="hse-data-menu ui compact menu">
+                <div class="ui basic label">Data</div>
+                <div class="ui simple dropdown item">
+                    Metocean<i class="dropdown icon"></i>
+                    <div class="menu">
+                        <a class="item" id="aguas">Águas superficiais Marinhas</a>
+                        <a class="item" id="air">Air quality</a>
+                        <a class="item" id="sediment">Marine Sediment</a>
+                        <a class="item" id="metocean">Metocean</a>
+                        <a class="item disabled" id="weather">Weather Forecast</a>
+                    </div>
+                </div>
+            </div>
+
+            <div class="menu-right">
+                <div class="ui compact menu">
+                    <div class="ui basic label">Start</div>
+                    <div class="ui simple dropdown disabled item">
+                        Jan 1, 2016<i class="dropdown icon"></i>
+                    </div>
+                </div>
+                <div class="ui compact menu">
+                    <div class="ui basic label">End</div>
+                    <div class="ui simple dropdown disabled item">
+                        Mars 31, 2016<i class="dropdown icon"></i>
+                    </div>
+                </div>
+
+                <div class="print ui large basic button">Print PDF</div>
+            </div>
+        </div>
+
+        <div class="map">
+            <img src="img/metocean.png"></img>
+        </div>
+    </div>
+
+    <div class="engineering view ui segment"></div>
+    <div class="director_board view ui segment"></div>
+
+</div>
+
+<script>
+
+var views = document.querySelectorAll('.view');
+
+var topMenuItems = document.querySelectorAll('.top-menu .item:not(.disabled)');
+[].forEach.call(topMenuItems, function(node){
+    node.addEventListener('click', function(event){
+        [].forEach.call(topMenuItems, function(node){ node.classList.remove('active'); });
+        this.classList.add('active');
+        console.log(this.id);
+
+        [].forEach.call(views, function(node){ node.classList.remove('active'); });
+        document.querySelector('.view.' + this.id).classList.add('active');
+
+    }, false);
+});
+
+var hseDataMenus = document.querySelectorAll('.hse-data-menu');
+var hseDataMenuItems = document.querySelectorAll('.hse-data-menu .item:not(.dropdown)');
+[].forEach.call(hseDataMenuItems, function(node){
+    node.addEventListener('click', function(event){
+        [].forEach.call(hseDataMenuItems, function(node){ node.classList.remove('active'); });
+        this.classList.add('active');
+        console.log(this.id);
+
+        [].forEach.call(views, function(node){ node.classList.remove('active'); });
+        document.querySelector('.view.' + this.id).classList.add('active');
+
+    }, false);
+});
+
+</script>
+
+<script src="water_chart.js"></script>
+<script src="air_chart.js"></script>
+<script src="sediment_chart.js"></script>
+
+</body>
+</html>

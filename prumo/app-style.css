@@ -1,0 +1,243 @@
+body {
+    font-family: helvetica;
+}
+
+/* chart */
+.piper-chart .label {
+    font-size: 10px;
+}
+
+.piper-chart .hover-line {
+    background-color: black;
+}
+
+.piper-chart .tooltip {
+    font-size: 8px;
+    background-color: white;
+    border: 1px solid white;
+    opacity: 1;
+    margin-left: 2px;
+    padding: 3px;
+    border-radius: 0px 10px 10px 10px;
+}
+
+.piper-chart .shape {
+    fill: skyblue;
+    fill-opacity: 0.3;
+    stroke: skyblue;
+    stroke-width: 1px;
+}
+
+.piper-chart .axis.y {
+    font-size: 12px;
+    fill: #666;
+}
+
+.piper-chart .axis.x text {
+    font-size: 12px;
+}
+
+.prumo-water .piper-chart .axis.x text {
+    display: none;
+}
+
+.prumo-water .piper-chart .axis.x line {
+    stroke: #ccc;
+}
+
+.prumo-water .piper-chart .axis.x .domain {
+    display: none;
+}
+
+.piper-chart .axis-title.x,
+.piper-chart .axis-title.y {
+    font-size: 10px;
+    fill: #666;
+}
+
+.piper-chart .chart-title {
+	font-size: 14px;
+}
+
+.prumo-water .piper-chart .chart-title {
+    font-size: 11px;
+}
+
+.piper-chart .domain {
+    fill: none;
+    stroke: black;
+}
+
+.piper-chart .tick line {
+    stroke: black;
+}
+
+.piper-chart .tooltip-line {
+    stroke: silver;
+}
+
+.piper-chart .threshold-label {
+	font-size: 10px;
+	fill: #888;
+}
+
+.piper-chart .threshold.shape {
+	stroke: #ccc;
+}
+
+/* layout */
+.container {
+    margin-left: 60px;
+	margin-top: 100px;
+}
+.chart-container{
+	float: left;
+}
+
+.sediment .bg-triangle,
+.sediment .tick path {
+    fill: white;
+    stroke: black;
+    stroke-opacity: 0.3;
+}
+
+.sediment .marker {
+    fill: skyblue;
+    stroke: royalblue;
+    fill-opacity: 0.5;
+}
+
+.sediment .axis-title path {
+    stroke: black;
+    fill: none;
+}
+
+.sediment .sector path {
+    stroke: maroon;
+    stroke-width: 1;
+}
+
+.sediment .sector text {
+    font-size: 10px;
+    font-family: Helvetica;
+}
+
+.sediment .clay path {
+    fill: #f0be99;
+}
+
+.sediment .silty-clay path {
+    fill: #c8ad98;
+}
+
+.sediment .silty-clay-loam path {
+    fill: #bbaea8;
+}
+
+.sediment .clay-loam path {
+    fill: #c0a18c;
+}
+
+.sediment .sandy-clay path {
+    fill: #e3e1cc;
+}
+
+.sediment .sandy-clay-loam path {
+    fill: #d3c19d;
+}
+
+.sediment .loam path {
+    fill: #cac3a9;
+}
+
+.sediment .sandy-loam path {
+    fill: #d1cca2;
+}
+
+.sediment .loamy-sand path {
+    fill: #c3bca0;
+}
+
+.sediment .sand path {
+    fill: #eeebcc;
+}
+
+.sediment .silt-loam path {
+    fill: #e8e2d6;
+}
+
+.sediment .silt path {
+    fill: #a6a8a7;
+}
+
+.menu-right {
+    float: right;    
+}
+
+.menu-right > * {
+    display: inline-flex;
+}
+
+.ui.basic.label {
+    padding-top: 13px;
+    border-radius: 0;
+    border-width: 0!important;
+    border-right-width: 1px!important;
+    background: none!important;
+    font-size: 1rem!important;
+}
+
+.ui.large.basic.button {
+    font-size: 1.1rem;
+    min-height: 2.8em;
+}
+
+.ui.menu {
+    box-shadow: none!important;
+}
+
+.ui.menu .item.disabled,
+.ui.menu .item.disabled:hover,
+.submenu .ui.menu .ui.dropdown .menu>.item.disabled,
+.print.ui.basic.button {
+    color: #aaa!important;
+    opacity: 1!important;
+}
+
+.submenu {
+    padding: 0 14px 14px 14px;
+}
+
+.map, .title, .charts-container {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.title {
+    padding: 14px 0 28px 0;
+    font-size: 1.3em;
+    font-weight: bold;
+}
+
+.title div {
+    float: left;
+}
+
+.map img {
+    width: 100%;
+}
+
+.print {
+    margin-left: 12px!important;
+    padding-left: 14px!important;
+    padding-right: 14px!important;
+}
+
+.live {
+    margin-left: 12px!important;
+}
+
+.sediment .charts-container{
+    margin: 0 auto;
+    width: 500px;
+}
