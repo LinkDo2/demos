@@ -56,13 +56,13 @@ d3.text('water.csv', function(error, text) {
             .key(function(d) { return d.timestamp; })
             .entries(dataCleaned);
 
-        var chartContainer = container.append('div').classed('chart-container', true);
+        var chartContainer = container.append('div').classed('chart-container ui card', true);
 
         var chart = piper.barChartGroupedPrumo({
                 container: chartContainer.node(),
                 width: 300,
                 height: 100,
-                margin: {top: 30, right: 44, bottom: 35, left: 80},
+                margin: {top: 30, right: 70, bottom: 35, left: 60},
                 data: nestedData,
                 axisTitleY: csvParsed[1],
                 chartTitle: csvParsed[0],

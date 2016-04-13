@@ -418,7 +418,8 @@ piper.chartTitleComponent = function(_config) {
 piper.tooltipWidget = function(tooltipNode) {
     var root = d3.select(tooltipNode).style({
         position: "absolute",
-        "pointer-events": "none"
+        "pointer-events": "none",
+        display: "none"
     });
     var setText = function(html) {
         root.html(html);
@@ -443,11 +444,15 @@ piper.tooltipWidget = function(tooltipNode) {
         });
         return this;
     };
+    var getRootNode = function() {
+        return root.node();
+    };
     return {
         setText: setText,
         setPosition: position,
         show: show,
-        hide: hide
+        hide: hide,
+        getRootNode: getRootNode
     };
 };
 
@@ -560,8 +565,8 @@ piper.HTMLTooltip = function(_config) {
     tooltipContainer.enter().append("div").classed("tooltip", true);
     var tooltip = piper.tooltipWidget(tooltipContainer.node());
     config.mousemove.on(function(d) {
-        var pos = d.shapePositionFromContainer;
-        tooltip.setPosition([ pos[0] + 10, pos[1] - 10 ]).setText(d.data.y);
+        var pos = d.shapePositionFromContainer2;
+        tooltip.setPosition([ pos[0], pos[1] ]).setText(d.data.y);
     });
     config.mouseenter.on(function(d) {
         tooltip.show();
@@ -593,7 +598,8 @@ piper.hoverCircle = function(_config) {
         var root = d3.select(circleNode).attr({
             r: 4
         }).style({
-            "pointer-events": "none"
+            "pointer-events": "none",
+            display: "none"
         });
         var position = function(pos) {
             root.attr({
@@ -920,7 +926,8 @@ piper.hoverEvents = function(_config) {
             mouse: mouse,
             mouseFromContainer: [ mouseFromContainer[0] + absoluteOffsetLeft + window.pageXOffset, mouseFromContainer[1] + absoluteOffsetTop + window.pageYOffset ],
             shapePosition: [ x, y ],
-            shapePositionFromContainer: [ x + panelBBox.left, y + panelBBox.top + window.pageYOffset ]
+            shapePositionFromContainer: [ x + panelBBox.left, y + panelBBox.top + window.pageYOffset ],
+            shapePositionFromContainer2: [ x + panelBBox.left - containerBBox.left, y + panelBBox.top - containerBBox.top ]
         });
     });
     return {

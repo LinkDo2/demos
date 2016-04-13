@@ -23,14 +23,14 @@ d3.csv('air.csv', function(error, data){
     nest
     // .slice(0, 1)
     .forEach(function(d){
-        var chartContainer = container.append('div').classed('chart-container', true);
+        var chartContainer = container.append('div').classed('chart-container ui card', true);
         d.values.sort(function(a, b){ return a.timestamp.getTime() - b.timestamp.getTime(); });
 
         var chart = piper.areaChartTimeRotated({
             container: chartContainer.node(),
-            width: 1200,
+            width: 1000,
             height: 250,
-            margin: {top: 30, right: 44, bottom: 100, left: 80},
+            margin: {top: 30, right: 30, bottom: 60, left: 60},
             data: d.values,
             chartTitle: d.key
         });

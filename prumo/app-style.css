@@ -1,5 +1,6 @@
-body {
+body.prumo-app {
     font-family: helvetica;
+    background-color: #F7F9FB;
 }
 
 /* chart */
@@ -11,14 +12,21 @@ body {
     background-color: black;
 }
 
-.piper-chart .tooltip {
+.tooltip {
     font-size: 8px;
-    background-color: white;
+    color: #eee;
+    background-color: #575F6D;
     border: 1px solid white;
     opacity: 1;
     margin-left: 2px;
     padding: 3px;
-    border-radius: 0px 10px 10px 10px;
+    border-radius: 0px 6px 6px 6px;
+    z-index: 2;
+    display: none;
+}
+
+.ui.card>:last-child.tooltip, .ui.cards>.card>:last-child.tooltip {
+    border-radius: 0px 6px 6px 6px!important;
 }
 
 .piper-chart .shape {
@@ -90,8 +98,14 @@ body {
     margin-left: 60px;
 	margin-top: 100px;
 }
-.chart-container{
+
+.chart-container.ui.card {
 	float: left;
+    margin-left: 30px!important;
+}
+
+.prumo-air .chart-container.ui.card {
+    width: 1000px;
 }
 
 .sediment .bg-triangle,
@@ -199,28 +213,65 @@ body {
 .ui.menu .item.disabled,
 .ui.menu .item.disabled:hover,
 .submenu .ui.menu .ui.dropdown .menu>.item.disabled,
-.print.ui.basic.button {
+.print.ui.basic.button,
+.top-menu.ui.secondary.inverted.menu .link.item.disabled, 
+.top-menu.ui.secondary.inverted.menu a.item.disabled {
     color: #aaa!important;
     opacity: 1!important;
 }
 
+.top-menu {
+     background-color: #2882BE!important;
+     height: 70px;
+     margin-bottom: 0!important;
+}
+
+.top-menu .item {
+    -webkit-align-self: center!important;
+    -ms-flex-item-align: center!important;
+     align-self: center!important;
+}
+
+#planetos-logo {
+    padding-left: 20px;
+    padding-right: 20px;
+}
+
+#prumo-logo {
+    position: absolute;
+    right: 0;
+}
+
 .submenu {
-    padding: 0 14px 14px 14px;
+    padding: 14px;
+    background: white;
 }
 
 .map, .title, .charts-container {
     max-width: 1200px;
     margin: 0 auto;
+    border-top: 1px solid #ddd;
 }
 
 .title {
-    padding: 14px 0 28px 0;
+    padding: 20px;
     font-size: 1.3em;
     font-weight: bold;
+    height: 60px;
+    background: white;
 }
 
 .title div {
     float: left;
+}
+
+.title .name {
+    padding-right: 40px;
+    border-right: 2px #ccc solid;
+}
+
+.title .detail {
+    padding-left: 20px;
 }
 
 .map img {
