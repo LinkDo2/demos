@@ -20,6 +20,9 @@ d3.csv('air.csv', function(error, data){
         // .key(function(d) { return parseInt(d.timestamp.getMonth()) + 1; })
         .entries(dataParsed);
 
+    var titles = ["PRUMO_TEMP","PRUMO_PM10","PRUMO_PTS","PRUMO_WS","PRUMO_WD","PRUMO_AT","PRUMO_RH","PRUMO_BP","PRUMO_SR","PRUMO_RAIN"];
+    var titlesReplacement = ["Temperatura do ar","Particulados inaláveis","Particulados totais em suspensão ","Velocidade do vento","Direção do vento","Temperatura","Umidade Relativa","Pressao atmosferica","Radiação Solar","Precipitação"];
+
     nest
     // .slice(0, 1)
     .forEach(function(d){
@@ -32,7 +35,7 @@ d3.csv('air.csv', function(error, data){
             height: 250,
             margin: {top: 30, right: 30, bottom: 60, left: 60},
             data: d.values,
-            chartTitle: d.key
+            chartTitle: titlesReplacement[titles.indexOf(d.key)]
         });
     });
 });

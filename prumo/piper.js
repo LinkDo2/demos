@@ -368,8 +368,8 @@ piper.axisTitleComponentX = function(_config) {
         "class": "x axis-title"
     });
     axisTitleX.text(config.axisTitleX || "").attr({
-        x: config.chartWidth - 40,
-        y: config.chartHeight + 35
+        x: config.chartWidth,
+        y: config.chartHeight
     });
     axisTitleX.exit().remove();
     return {};
@@ -397,7 +397,6 @@ piper.chartTitleComponent = function(_config) {
     var config = {
         panel: null,
         chartTitle: null,
-        chartHeight: null,
         chartWidth: null
     };
     piper.utils.override(config, _config);
@@ -407,7 +406,7 @@ piper.chartTitleComponent = function(_config) {
     });
     axisTitleX.text(config.chartTitle || "").attr({
         x: function(d) {
-            return (config.chartWidth - this.getBBox().width) / 2;
+            return (config.chartWidth - config.chartTitle.length * 5) / 2;
         },
         y: -5
     });

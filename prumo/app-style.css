@@ -250,7 +250,11 @@ body.prumo-app {
 .map, .title, .charts-container {
     max-width: 1200px;
     margin: 0 auto;
-    border-top: 1px solid #ddd;
+}
+
+.charts-container {
+    padding-top: 20px;
+    padding-bottom: 20px;
 }
 
 .title {
@@ -276,6 +280,8 @@ body.prumo-app {
 
 .map img {
     width: 100%;
+    display: block;
+    border: 1px solid #ddd;
 }
 
 .print {
