@@ -75,18 +75,13 @@ pointDataQueryModel.set({
 });
 
 opendapMetadataQueryModel.set({
-    threddsURL: 'http://thredds.planetos.com/thredds/dodsC/dpipe//rel_0_6x11_dataset/transform/scheme=/ftp/authority=/ftp.ncep.noaa.gov/path=/pub/data/nccf/com/gfs/prod/gfs.2016032912/gfs.t12z.sfluxgrbf00.grib2/chunk=/1/0/preview'
+    threddsURL: 'http://thredds.planetos.com/thredds/dodsC/dpipe//rel_0_6x11_dataset/transform/scheme=/ftp/authority=/ftp.ncep.noaa.gov/path=/pub/data/nccf/com/gfs/prod/gfs.2016041812/gfs.t12z.sfluxgrbf252.grib2/chunk=/1/0/preview'
 });
 
 opendapDataQueryModel.set({
-    threddsURL: 'http://thredds.planetos.com/thredds/dodsC/dpipe//rel_0_6x11_dataset/transform/scheme=/ftp/authority=/ftp.ncep.noaa.gov/path=/pub/data/nccf/com/gfs/prod/gfs.2016032912/gfs.t12z.sfluxgrbf00.grib2/chunk=/1/0/preview',
-    variableName: 'Geopotential_height_hybrid',
-    dimensionFilters: [
-        [0, 1, 0],
-        [0, 1, 0],
-        [0, 1, 383],
-        [0, 1, 767]
-    ]
+    threddsURL: 'http://thredds.planetos.com/thredds/dodsC/dpipe//rel_0_6x11_dataset/transform/scheme=/ftp/authority=/ftp.ncep.noaa.gov/path=/pub/data/nccf/com/gfs/prod/gfs.2016041812/gfs.t12z.sfluxgrbf252.grib2/chunk=/1/0/preview',
+    variableName: 'Temperature_hybrid',
+    dimensionFilters: [[0,1,0],[0,1,0],[0,1,287],[0,1,575]]
 });
 
 var variableDetailsNode = document.querySelector('.variable-details');
