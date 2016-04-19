@@ -17,8 +17,13 @@
     text {
     	fill: #333;
     }
-    line, path {
+    .chart line, .chart path {
     	stroke: #333;
+    }
+    path.leaflet-clickable{
+    	stroke: aliceblue;
+    	stroke-opacity: 0.5;
+    	stroke-width: 2px;
     }
     #map {
         position: absolute;
@@ -30,17 +35,18 @@
     #message {
     	position: absolute;
     	left: 260px;
+    	top: 20px;
     }
     #coordinates {
     	position: absolute;
-	    top: 600px;
+	    top: 580px;
     	left: 50px;
     }
     .chart {
     	position: absolute;
     	width: 400px;
     	height: 25px;
-    	top: 540px;
+    	top: 520px;
     	left: 290px;
     }
 	.chart .label {
@@ -90,7 +96,7 @@
     <script>
     L.mapbox.accessToken = 'pk.eyJ1IjoiY2hyaXN2aWF1IiwiYSI6ImFERnVTeXcifQ.Eun4jtPE8upbuP2uKawtFw';
     var map = L.mapbox.map('map',   'mapbox.streets')
-        .setView([21.338912,   -158.000057],   10);
+        .setView([21.388912,   -158.000057],   10);
 
     var line = [
         [21.746127831916144,   -158.34653734855758],  
