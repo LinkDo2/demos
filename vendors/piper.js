@@ -11,6 +11,7 @@ piper.utils = {
                 var cache = fns[i].call(this, config);
                 config = that.mergeAll(config, cache);
             }
+            return config;
         };
     },
     override: function(_objA, _objB) {
@@ -38,6 +39,39 @@ piper.utils = {
             this.merge(newObj, objs[i]);
         }
         return newObj;
+    },
+    reactiveProperty: function(value) {
+        var listeners;
+        function property(newValue) {
+            if (arguments.length === 1) {
+                value = newValue;
+                if (listeners) {
+                    for (var i = 0; i < listeners.length; i++) {
+                        listeners[i](value);
+                    }
+                }
+                return this;
+            }
+            return value;
+        }
+        property.on = function(listener) {
+            if (!listeners) {
+                listeners = [];
+            }
+            listeners.push(listener);
+            if (typeof value !== "undefined" && value !== null) {
+                listener(value);
+            }
+            return listener;
+        };
+        property.off = function(listenerToRemove) {
+            if (listeners) {
+                listeners = listeners.filter(function(listener) {
+                    return listener !== listenerToRemove;
+                });
+            }
+        };
+        return property;
     }
 };
 
@@ -76,6 +110,29 @@ piper.dataTime = function(_config) {
     });
     return {
         dataConverted: dataConverted
+    };
+};
+
+piper.dataGrouped = function(_config) {
+    var config = {
+        data: null
+    };
+    piper.utils.override(config, _config);
+    var dataConverted = config.data.map(function(d, i) {
+        return {
+            x: i,
+            groupName: d.key,
+            y: d.values.map(function(dB, iB) {
+                return dB.value;
+            })
+        };
+    });
+    var dataFlat = d3.merge(dataConverted.map(function(d, i) {
+        return d.y;
+    }));
+    return {
+        dataConverted: dataConverted,
+        dataFlat: dataFlat
     };
 };
 
@@ -135,7 +192,25 @@ piper.scaleY = function(_config) {
     };
 };
 
-piper.scaleYStartAt0 = function(_config) {
+piper.scaleYGrouped = function(_config) {
+    var config = {
+        dataConverted: null,
+        margin: null,
+        height: null
+    };
+    piper.utils.override(config, _config);
+    var chartHeight = config.height - config.margin.top - config.margin.bottom;
+    var dataY = config.dataConverted.map(function(d) {
+        return d.y;
+    });
+    var scaleY = d3.scale.linear().domain(d3.extent(d3.merge(dataY))).range([ chartHeight, 0 ]);
+    return {
+        scaleY: scaleY,
+        chartHeight: chartHeight
+    };
+};
+
+piper.scaleYFrom0 = function(_config) {
     var config = {
         dataConverted: null,
         margin: null,
@@ -151,6 +226,37 @@ piper.scaleYStartAt0 = function(_config) {
         scaleY: scaleY,
         chartHeight: chartHeight
     };
+};
+
+piper.scaleYFrom0Padded = function(_config) {
+    var config = {
+        dataConverted: null,
+        margin: null,
+        height: null
+    };
+    piper.utils.override(config, _config);
+    var chartHeight = config.height - config.margin.top - config.margin.bottom;
+    var dataY = config.dataConverted.map(function(d) {
+        return d.y;
+    });
+    var valueMax = d3.max(dataY);
+    var topPadding = 1 - (valueMax - d3.min(dataY)) / valueMax;
+    var valuePadded = valueMax + valueMax * topPadding;
+    var scaleY = d3.scale.linear().domain([ 0, valuePadded ]).range([ chartHeight, 0 ]);
+    return {
+        scaleY: scaleY,
+        chartHeight: chartHeight
+    };
+};
+
+piper.scaleYExtent = function(_config) {
+    var config = {
+        extentY: null,
+        scaleY: null
+    };
+    piper.utils.override(config, _config);
+    config.scaleY.domain(config.extentY);
+    return {};
 };
 
 piper.axisX = function(_config) {
@@ -169,13 +275,11 @@ piper.axisX = function(_config) {
 
 piper.axisY = function(_config) {
     var config = {
-        scaleY: null,
-        chartWidth: null,
-        margin: null,
-        axisYPadding: 0
+        scaleY: null
     };
     piper.utils.override(config, _config);
-    var axisY = d3.svg.axis().scale(config.scaleY).orient("left").ticks(6, "s").tickPadding(10);
+    var height = config.scaleY.range()[0];
+    var axisY = d3.svg.axis().scale(config.scaleY).orient("left").ticks(Math.max(~~(height / 30), 2), ".s3").tickPadding(10);
     return {
         axisY: axisY
     };
@@ -274,8 +378,8 @@ piper.axisTitleComponentX = function(_config) {
         "class": "x axis-title"
     });
     axisTitleX.text(config.axisTitleX || "").attr({
-        x: config.chartWidth - 40,
-        y: config.chartHeight + 40
+        x: config.chartWidth,
+        y: config.chartHeight
     });
     axisTitleX.exit().remove();
     return {};
@@ -299,11 +403,71 @@ piper.axisTitleComponentY = function(_config) {
     return {};
 };
 
-piper.tresholdLine = function(_config) {
+piper.chartTitleComponent = function(_config) {
     var config = {
         panel: null,
-        dataConverted: null,
-        scaleX: null,
+        chartTitle: null,
+        chartWidth: null
+    };
+    piper.utils.override(config, _config);
+    var axisTitleX = config.panel.selectAll("text.chart-title").data([ 0 ]);
+    axisTitleX.enter().append("text").attr({
+        "class": "chart-title"
+    });
+    axisTitleX.text(config.chartTitle || "").attr({
+        x: function(d) {
+            return (config.chartWidth - config.chartTitle.length * 5) / 2;
+        },
+        y: -5
+    });
+    axisTitleX.exit().remove();
+    return {};
+};
+
+piper.tooltipWidget = function(tooltipNode) {
+    var root = d3.select(tooltipNode).style({
+        position: "absolute",
+        "pointer-events": "none",
+        display: "none"
+    });
+    var setText = function(html) {
+        root.html(html);
+        return this;
+    };
+    var position = function(pos) {
+        root.style({
+            left: pos[0] + "px",
+            top: pos[1] + "px"
+        });
+        return this;
+    };
+    var show = function() {
+        root.style({
+            display: "block"
+        });
+        return this;
+    };
+    var hide = function() {
+        root.style({
+            display: "none"
+        });
+        return this;
+    };
+    var getRootNode = function() {
+        return root.node();
+    };
+    return {
+        setText: setText,
+        setPosition: position,
+        show: show,
+        hide: hide,
+        getRootNode: getRootNode
+    };
+};
+
+piper.thresholdLine = function(_config) {
+    var config = {
+        panel: null,
         scaleY: null,
         margin: null,
         chartWidth: null,
@@ -314,10 +478,10 @@ piper.tresholdLine = function(_config) {
         return {};
     }
     var scaledThresholdY = config.scaleY(config.thresholdY);
-    var path = "M" + [ [ config.margin.left, scaledThresholdY ], [ config.chartWidth, scaledThresholdY ] ].join("L");
-    var shapes = config.panel.selectAll("path.treshold").data([ 0 ]);
+    var path = "M" + [ [ 0, scaledThresholdY ], [ config.chartWidth + 6, scaledThresholdY ] ].join("L");
+    var shapes = config.panel.selectAll("path.threshold").data([ 0 ]);
     shapes.enter().append("path").attr({
-        "class": "treshold shape"
+        "class": "threshold shape"
     }).style({
         fill: "none"
     });
@@ -325,6 +489,32 @@ piper.tresholdLine = function(_config) {
         d: path
     });
     shapes.exit().remove();
+    return {};
+};
+
+piper.thresholdLineLabel = function(_config) {
+    var config = {
+        panel: null,
+        scaleY: null,
+        margin: null,
+        chartWidth: null,
+        thresholdY: null,
+        thresholdYLabel: null
+    };
+    piper.utils.override(config, _config);
+    if (!config.thresholdYLabel) {
+        return {};
+    }
+    var scaledThresholdY = config.scaleY(config.thresholdY);
+    var path = "M" + [ [ 0, scaledThresholdY ], [ config.chartWidth + 6, scaledThresholdY ] ].join("L");
+    var text = config.panel.selectAll("text.threshold-label").data([ 0 ]);
+    text.enter().append("text").attr({
+        "class": "threshold-label",
+        x: config.chartWidth + 8,
+        y: scaledThresholdY + 2
+    });
+    text.text(config.thresholdYLabel);
+    text.exit().remove();
     return {};
 };
 
@@ -359,6 +549,103 @@ piper.verticalLine = function(_config) {
         y: config.chartHeight + config.margin.top + config.margin.bottom / 4
     }).text(config.verticalLineValue);
     shapes.exit().remove();
+    return {};
+};
+
+piper.HTMLTooltip = function(_config) {
+    var config = {
+        container: null,
+        panel: null,
+        dataConverted: null,
+        scaleX: null,
+        scaleY: null,
+        eventPanel: null,
+        mousemove: null,
+        mouseenter: null,
+        mouseout: null,
+        chartWidth: null,
+        chartHeight: null
+    };
+    piper.utils.override(config, _config);
+    if (!config.mousemove) {
+        piper.utils.override(config, piper.hoverEvents(config));
+    }
+    var tooltipContainer = d3.select(config.container).selectAll("div.tooltip").data([ 0 ]);
+    tooltipContainer.enter().append("div").classed("tooltip", true);
+    var tooltip = piper.tooltipWidget(tooltipContainer.node());
+    config.mousemove.on(function(d) {
+        var pos = d.shapePositionFromContainer2;
+        tooltip.setPosition([ pos[0], pos[1] ]).setText(d.data.y);
+    });
+    config.mouseenter.on(function(d) {
+        tooltip.show();
+    });
+    config.mouseout.on(function(d) {
+        tooltip.hide();
+    });
+    return {};
+};
+
+piper.hoverCircle = function(_config) {
+    var config = {
+        panel: null,
+        dataConverted: null,
+        scaleX: null,
+        scaleY: null,
+        eventPanel: null,
+        mousemove: null,
+        mouseenter: null,
+        mouseout: null,
+        chartWidth: null,
+        chartHeight: null
+    };
+    piper.utils.override(config, _config);
+    if (!config.mousemove) {
+        piper.utils.override(config, piper.hoverEvents(config));
+    }
+    var circleComponent = function(circleNode) {
+        var root = d3.select(circleNode).attr({
+            r: 4
+        }).style({
+            "pointer-events": "none",
+            display: "none"
+        });
+        var position = function(pos) {
+            root.attr({
+                transform: "translate(" + pos + ")"
+            });
+            return this;
+        };
+        var show = function() {
+            root.style({
+                display: "block"
+            });
+            return this;
+        };
+        var hide = function() {
+            root.style({
+                display: "none"
+            });
+            return this;
+        };
+        return {
+            setPosition: position,
+            show: show,
+            hide: hide
+        };
+    };
+    var circleContainer = config.panel.selectAll("circle.hover").data([ 0 ]);
+    circleContainer.enter().append("circle").classed("hover", true);
+    var tooltip = circleComponent(circleContainer.node());
+    config.mousemove.on(function(d) {
+        tooltip.setPosition(d.shapePosition);
+    });
+    config.mouseenter.on(function(d) {
+        tooltip.show();
+    });
+    config.mouseout.on(function(d) {
+        tooltip.hide();
+    });
     return {};
 };
 
@@ -461,13 +748,69 @@ piper.barShapes = function(_config) {
             return config.scaleX(d.x) - barWidth / 2;
         },
         y: function(d) {
-            return config.scaleY(d.y);
+            var barY = config.scaleY(d.y);
+            d.barY = d.y > 0 && barY === config.chartHeight ? config.chartHeight - 1 : barY;
+            return d.barY;
         },
         width: function(d) {
             return barWidth;
         },
         height: function(d) {
-            return config.chartHeight - config.scaleY(d.y);
+            return config.chartHeight - d.barY;
+        }
+    });
+    shapes.exit().remove();
+    return {};
+};
+
+piper.barShapesGrouped = function(_config) {
+    var config = {
+        panel: null,
+        dataConverted: null,
+        dataFlat: null,
+        scaleX: null,
+        scaleY: null,
+        chartHeight: null,
+        chartWidth: null,
+        shapePanel: null
+    };
+    piper.utils.override(config, _config);
+    var newConfig = piper.shapePanel(config);
+    piper.utils.override(config, newConfig);
+    var barWidth = config.chartWidth / (config.dataFlat.length - 1) / 2;
+    var groupWidth = config.chartWidth / (config.dataConverted.length - 1);
+    var groups = config.shapePanel.selectAll("g.shape-group").data(config.dataConverted);
+    groups.enter().append("g").attr({
+        "class": "shape-group"
+    });
+    groups.attr({
+        transform: function(d, i) {
+            return "translate(" + (groupWidth * i - groupWidth / 4) + " 0)";
+        }
+    });
+    groups.exit().remove();
+    var shapes = groups.selectAll("rect.bar").data(function(d) {
+        return d.y;
+    });
+    shapes.enter().append("rect").attr({
+        "class": "bar shape"
+    });
+    shapes.transition().attr({
+        x: function(d, i) {
+            return barWidth * i;
+        },
+        y: function(d) {
+            var barY = config.scaleY(d);
+            barY = d && d > 0 && barY === config.chartHeight ? config.chartHeight - 1 : barY;
+            return barY;
+        },
+        width: function(d) {
+            return barWidth;
+        },
+        height: function(d) {
+            var barY = config.scaleY(d);
+            barY = d && d > 0 && barY === config.chartHeight ? config.chartHeight - 1 : barY;
+            return config.chartHeight - barY;
         }
     });
     shapes.exit().remove();
@@ -527,8 +870,7 @@ piper.eventCatchingLayer = function(_config) {
         "pointer-events": "all"
     });
     return {
-        eventPanel: eventPanel,
-        dispatch: dispatch
+        eventPanel: eventPanel
     };
 };
 
@@ -542,6 +884,66 @@ piper.events = function(_config) {
         d3.rebind(config.eventer, config.dispatch, "on");
     }
     return {};
+};
+
+piper.hoverEvents = function(_config) {
+    var config = {
+        container: null,
+        panel: null,
+        dataConverted: null,
+        scaleX: null,
+        scaleY: null,
+        chartWidth: null,
+        chartHeight: null,
+        eventPanel: null
+    };
+    piper.utils.override(config, _config);
+    piper.utils.override(config, piper.eventCatchingLayer(config));
+    var mousemove = piper.utils.reactiveProperty();
+    var mouseenter = piper.utils.reactiveProperty();
+    var mouseout = piper.utils.reactiveProperty();
+    var dataConvertedX = config.dataConverted.map(function(d) {
+        return d.x;
+    });
+    var deltaX = config.scaleX(dataConvertedX[1]) - config.scaleX(dataConvertedX[0]);
+    config.eventPanel.on("mouseenter", function(d) {
+        mouseenter({
+            mouse: d3.mouse(this)
+        });
+    }).on("mouseout", function(d) {
+        mouseout({
+            mouse: d3.mouse(this)
+        });
+    }).on("mousemove", function(d, i) {
+        var mouse = d3.mouse(this);
+        var mouseFromContainer = d3.mouse(config.container);
+        var panelBBox = this.getBoundingClientRect();
+        var containerBBox = config.container.getBoundingClientRect();
+        var absoluteOffsetLeft = containerBBox.left;
+        var absoluteOffsetTop = containerBBox.top;
+        var dateAtCursor = config.scaleX.invert(mouse[0] - deltaX / 2);
+        var dataPointIndexAtCursor = d3.bisectLeft(dataConvertedX, dateAtCursor);
+        var dataPointAtCursor = config.dataConverted[dataPointIndexAtCursor];
+        if (dataPointAtCursor) {
+            var xValue = dataPointAtCursor.x;
+            var value = dataPointAtCursor.y;
+            var x = config.scaleX(xValue);
+            var y = config.scaleY(value);
+        }
+        mousemove({
+            data: dataPointAtCursor,
+            mouse: mouse,
+            mouseFromContainer: [ mouseFromContainer[0] + absoluteOffsetLeft + window.pageXOffset, mouseFromContainer[1] + absoluteOffsetTop + window.pageYOffset ],
+            shapePosition: [ x, y ],
+            shapePositionFromContainer: [ x + panelBBox.left, y + panelBBox.top + window.pageYOffset ],
+            shapePositionFromContainer2: [ x + panelBBox.left - containerBBox.left, y + panelBBox.top - containerBBox.top ]
+        });
+    });
+    return {
+        mousemove: mousemove,
+        mouseenter: mouseenter,
+        mouseout: mouseout
+    };
 };
 
 piper.tooltipComponent = function(_config) {
@@ -584,6 +986,7 @@ piper.tooltipComponent = function(_config) {
         visibility: "hidden"
     }).append("text").attr({
         "class": "value-label",
+        dx: 2,
         dy: -4
     });
     valueGroup.exit().remove();
@@ -620,15 +1023,15 @@ piper.tooltipComponent = function(_config) {
         tooltipLine.style({
             visibility: "hidden"
         });
-    }).on("mousemove", function(d) {
+    }).on("mousemove", function(d, i) {
         var mouse = d3.mouse(this);
         var dateAtCursor = config.scaleX.invert(mouse[0] - deltaX / 2);
         var dataPointIndexAtCursor = d3.bisectLeft(dataConvertedX, dateAtCursor);
         var dataPointAtCursor = config.dataConverted[dataPointIndexAtCursor];
         if (dataPointAtCursor) {
-            var date = dataPointAtCursor.x;
+            var xValue = dataPointAtCursor.x;
             var value = dataPointAtCursor.y;
-            var x = config.scaleX(date);
+            var x = config.scaleX(xValue);
             var y = config.scaleY(value);
             tooltipGroup.attr({
                 transform: "translate(" + [ x, y ] + ")"
@@ -644,7 +1047,6 @@ piper.tooltipComponent = function(_config) {
                 y2: y
             });
         }
-        config.dispatch.mousemove(dataPointAtCursor);
     });
     return {};
 };
@@ -667,7 +1069,7 @@ piper.axisXFormatterTimeHour = function(_config) {
     };
     piper.utils.override(config, _config);
     config.panel.select("g.axis.x").selectAll(".tick text").text(function(d) {
-        return d3.time.format("%H:%M")(d);
+        return d3.time.format("%x")(d);
     });
     return {};
 };
@@ -684,17 +1086,32 @@ piper.axisXFormatterRotate30 = function(_config) {
     return {};
 };
 
-piper.areaChart = piper.utils.pipeline(piper.data, piper.scaleX, piper.scaleY, piper.axisX, piper.axisY, piper.panelComponent, piper.areaShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.tooltipComponent);
+piper.axisYFormatSI = function(_config) {
+    var config = {
+        axisY: null
+    };
+    piper.utils.override(config, _config);
+    config.axisY.tickFormat(d3.format(".2s"));
+    return {};
+};
+
+piper.areaChart = piper.utils.pipeline(piper.data, piper.scaleX, piper.scaleY, piper.scaleYExtent, piper.axisX, piper.axisY, piper.axisYFormatSI, piper.panelComponent, piper.areaShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.chartTitleComponent, piper.tooltipComponent);
 
 piper.areaChartTime = piper.utils.pipeline(piper.dataTime, piper.scaleXTime, piper.scaleY, piper.axisX, piper.axisY, piper.panelComponent, piper.areaShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.axisXFormatterTimeHour, piper.tooltipComponent);
 
-piper.areaChartTimeRotated = piper.utils.pipeline(piper.dataTime, piper.scaleXTime, piper.scaleY, piper.axisX, piper.axisY, piper.panelComponent, piper.areaShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.axisXFormatterTimeHour, piper.axisXFormatterRotate30, piper.tooltipComponent);
+piper.areaChartTimeRotated = piper.utils.pipeline(piper.dataTime, piper.scaleXTime, piper.scaleY, piper.scaleYExtent, piper.axisX, piper.axisY, piper.panelComponent, piper.areaShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.chartTitleComponent, piper.axisXFormatterTimeHour, piper.axisXFormatterRotate30, piper.hoverEvents, piper.HTMLTooltip, piper.hoverCircle);
+
+piper.areaChartFrom0 = piper.utils.pipeline(piper.data, piper.scaleX, piper.scaleYFrom0Padded, piper.axisX, piper.axisY, piper.panelComponent, piper.areaShapes, piper.axisComponentY, piper.thresholdLine, piper.thresholdLineLabel, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.chartTitleComponent, piper.tooltipComponent);
 
 piper.lineChart = piper.utils.pipeline(piper.data, piper.scaleX, piper.scaleY, piper.axisX, piper.axisY, piper.panelComponent, piper.lineShapes, piper.axisComponentX, piper.axisComponentY, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.tooltipComponent);
 
 piper.sparkline = piper.utils.pipeline(piper.data, piper.scaleX, piper.scaleY, piper.panelComponent, piper.lineShapes, piper.endCircle, piper.tooltipComponent);
 
 piper.barChart = piper.utils.pipeline(piper.data, piper.barChartAutoConfig, piper.scaleX, piper.scaleYStartAt0, piper.axisX, piper.axisY, piper.panelComponent, piper.barShapes, piper.axisComponentY, piper.axisComponentX);
+
+piper.barChartPrumo = piper.utils.pipeline(piper.data, piper.barChartAutoConfig, piper.scaleX, piper.scaleY, piper.axisX, piper.axisY, piper.panelComponent, piper.barShapes, piper.axisComponentY, piper.thresholdLine, piper.thresholdLineLabel, piper.axisTitleComponentX, piper.axisTitleComponentY, piper.chartTitleComponent, piper.tooltipComponent);
+
+piper.barChartGroupedPrumo = piper.utils.pipeline(piper.dataGrouped, piper.barChartAutoConfig, piper.scaleX, piper.scaleYGrouped, piper.axisX, piper.axisY, piper.panelComponent, piper.barShapesGrouped, piper.axisComponentX, piper.axisComponentY, piper.thresholdLine, piper.thresholdLineLabel, piper.axisTitleComponentY, piper.chartTitleComponent, piper.hoverEvents);
 
 piper.singleAxis = piper.utils.pipeline(piper.data, piper.scaleX, piper.axisX, piper.panelComponent, piper.singleAxisComponentX);
 

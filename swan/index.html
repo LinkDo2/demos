@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script src='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.js'></script>
+    <script src='https://d3js.org/d3.v3.js'></script>
+    <script src='../vendors/piper.js'></script>
+    <link href='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.css' rel='stylesheet' />
+    <style>
+    body {
+        margin: 0;
+        padding: 0;
+        font-family: Helvetica;
+        color: #333;
+    }
+    text {
+    	fill: #333;
+    }
+    line, path {
+    	stroke: #333;
+    }
+    #map {
+        position: absolute;
+        top: 0;
+        bottom: 0;
+        height: 700px;
+        width: 700px;
+    }
+    #message {
+    	position: absolute;
+    	left: 260px;
+    }
+    #coordinates {
+    	position: absolute;
+	    top: 600px;
+    	left: 50px;
+    }
+    .chart {
+    	position: absolute;
+    	width: 400px;
+    	height: 25px;
+    	top: 540px;
+    	left: 290px;
+    }
+	.chart .label {
+	    font-size: 10px;
+	}
+	.chart .hover-line {
+	    background-color: black;
+	}
+	.chart .tooltip {
+	    font-size: 10px;
+	    background-color: white;
+	    border: 1px solid white;
+	    opacity: 1;
+	    margin-left: 2px;
+	    padding: 3px;
+	    border-radius: 0px 10px 10px 10px;
+	}
+	.chart circle.hover {
+		fill: royalblue;
+	}
+	.chart .shape {
+        fill: skyblue;
+	    fill-opacity: 1;
+	    stroke: royalblue;
+	    stroke-width: 1px;
+	}
+	.chart .grid-line-x {
+	    background-color: silver;
+	}
+	.chart .axis-title {
+	    font-size: 11px;
+	}
+	.chart .axis.x .tick text {
+	    font-size: 10px;
+	}
+	.chart .domain {
+	    fill: none;
+	}
+    </style>
+</head>
+
+<body>
+    <div id='map'></div>
+    <div id='message'>Drag the cursor in the water.</div>
+    <div id='coordinates'></div>
+    <div class='chart'></div>
+    <script>
+    L.mapbox.accessToken = 'pk.eyJ1IjoiY2hyaXN2aWF1IiwiYSI6ImFERnVTeXcifQ.Eun4jtPE8upbuP2uKawtFw';
+    var map = L.mapbox.map('map',   'mapbox.streets')
+        .setView([21.338912,   -158.000057],   10);
+
+    var line = [
+        [21.746127831916144,   -158.34653734855758],  
+        [21.749265629311193,   -157.60131046723376],  
+        [21.197013287782838,   -157.5966037711412],  
+        [21.19858218648036,   -158.3481062472551],  
+        [21.746127831916144,   -158.34653734855758]
+    ];
+    var polyline = L.polyline(line).addTo(map);
+
+    var marker = L.marker([21.438912,   -158.000057],   {
+        icon: L.mapbox.marker.icon({
+            'marker-color': '#f86767'
+        }),  
+        draggable: true
+    }).addTo(map);
+
+    marker.on('dragend',   getPointData);
+    marker.on('drag',   showCoordinates);
+
+    function showCoordinates() {
+        var m = marker.getLatLng();
+        coordinates.innerHTML = 'Latitude: ' + m.lat + '<br />Longitude: ' + m.lng;
+    }
+
+    showCoordinates();
+
+    function getPointData(e) {
+
+    	var query = {
+    		lon: e.target._latlng.lng,  
+    		lat: e.target._latlng.lat,  
+    		dataset: 'pacioos_swan_oahu',  
+    		variable: 'shgt',  
+    		count: 180,  
+    		apiKey: '30536c8220304d03aeb8a818b00eaac3'
+    	};
+    	var URL = 'http://api.planetos.com/v1/datasets/'+query.dataset+
+    		'/point?'+
+    		'lon='+query.lon+
+    		'&lat='+query.lat+
+    		'&count='+query.count+
+    		'&apikey='+query.apiKey+
+    		'&var='+query.variable;
+
+    	d3.json(URL,   function(error, json){
+    		var data = json.entries.map(function(d){ return {timestamp: new Date(d.axes.time), value: d.data[query.variable]}; });
+
+    		piper.areaChartTimeRotated({
+	            container: document.querySelector('.chart'),
+	            width: 400,
+	            height: 150,
+	            margin: {top: 30, right: 40, bottom: 60, left: 40},
+	            data: data,
+	            chartTitle: 'Wave Height',
+	            axisTitleY: 'Meters',
+	            extentY: [0, 4]
+    		});
+    	})
+
+    }
+
+    </script>
+    <!-- <script src="app.js"></script> -->
+</body>
+
+</html>
