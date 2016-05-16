@@ -1,0 +1,47 @@
+body {
+	margin: 0; 
+	padding: 0;
+}
+#map, #raster {
+	position: absolute;
+	top: 0; 
+	bottom: 0;
+	right: 0;
+	width: 1500px;
+	height: 1102px;
+}
+
+.data-grid-layer {
+	/*opacity: 0.5;*/
+}
+
+#side-panel {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    background-color: #2882BE;
+    width: 420px;
+}
+
+.minimap {
+    width: 300px;
+    padding: 10px 50px;
+}
+
+.logo {
+	padding: 20px;	
+}
+
+.content .title {
+	font-family: Helvetica;
+	font-size: 32px;
+	color: white;
+	padding: 20px;
+}
+
+.content .text {
+	font-family: Helvetica;
+	font-size: 20px;
+	color: white;
+	padding: 20px;
+}

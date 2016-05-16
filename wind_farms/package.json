@@ -1,0 +1,13 @@
+{
+  "name": "canvas-grid-processor",
+  "version": "0.1.0",
+  "description": "PlanetOS script to process grid data for Mapbox",
+  "main": "./node-scripts/process-wind-data.js",
+  "dependencies": {
+    "async": "^2.0.0-rc.4",
+    "jsdap": "^6.0.0",
+    "request": "^2.72.0",
+    "xmlhttprequest": "^1.8.0"
+  },
+  "devDependencies": {}
+}

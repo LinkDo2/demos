@@ -1,0 +1,159 @@
+<!DOCTYPE html>
+<head>
+<meta charset="utf-8">
+<script src='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.js'></script>
+<script src='https://d3js.org/d3.v3.js'></script>
+<script src='jsdap.js'></script>
+<script src='node_modules/async/dist/async.js'></script>
+<script src='data-utils.js'></script>
+<script src='data-manager.js'></script>
+<script src='data-grid-layer.js'></script>
+<!-- <script src='https//cdnjs.cloudflare.com/ajax/libs/lodash.js/4.11.2/lodash.js'></script> -->
+<link href='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.css' rel='stylesheet' type="text/css" />
+<link href="style.css" rel="stylesheet" type="text/css" />
+<style>
+
+</style>
+</head>
+<body>
+<div id="side-panel">
+	<img class="logo" src="planetos-logo.svg">
+	<img class="minimap" src="minimap.jpg"/>
+	<div class="content">
+		<div class="title">Map of wind farms in the U.S. with current wind magnitude.</div>
+		<div class="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque risus lectus, pretium et efficitur eget, tristique a urna. Quisque non tellus eu magna mollis tincidunt. Aliquam auctor est leo, in congue orci aliquam ut. Pellentesque non nunc aliquam, faucibus eros sed, feugiat risus. Cras nibh mauris, vehicula vel commodo vel, tristique at neque. Pellentesque scelerisque laoreet ex, in mattis ex imperdiet eget. Morbi vehicula tincidunt scelerisque. Etiam lobortis, quam eu efficitur tincidunt, urna diam sollicitudin neque, vel molestie nulla orci a odio. Vivamus sollicitudin tellus risus. Nullam commodo ante ac luctus molestie. Interdum et malesuada fames ac ante ipsum primis in faucibus. Quisque faucibus nunc congue nunc imperdiet, in porttitor dolor rhoncus. Aliquam vestibulum mauris ipsum, id feugiat ex convallis quis.</div>
+	</div>
+</div>
+<div id="map"></div>
+<script>
+
+/*
+	TODO:
+	-grid canvas independent of marker canvas
+	-progressive rendering
+	-change resolution with zoom level by skipping
+	-automatic filter
+	-convert wind data script to node to output json file
+*/
+
+var southWest = L.latLng(89, 179),
+    northEast = L.latLng(-89, -179),
+    bounds = L.latLngBounds(southWest, northEast);
+
+// L.mapbox.accessToken = 'pk.eyJ1IjoicGxhbmV0b3MiLCJhIjoiZjZkNDE4MTE5NWNhOGYyMmZhZmNhMDQwMDg0YWMyNGUifQ.htlwo6U82iekTcpGtDR_dQ';
+L.mapbox.accessToken = 'pk.eyJ1IjoiY2hyaXN2aWF1IiwiYSI6ImFERnVTeXcifQ.Eun4jtPE8upbuP2uKawtFw';
+var map = L.mapbox.map('map', 'mapbox.streets', {
+// var map = L.mapbox.map('map', 'planetos.4f5251cf', {
+		maxBounds: bounds,
+		maxZoom: 19,
+    	minZoom: 2,
+    	scrollWheelZoom: false,
+    	attributionControl: false,
+	    tileLayer: {
+	    	noWrap: true,
+	    	continuousWorld: false
+		},
+		zoomControl: false
+	})
+	.setView([40.371659, -100.195313], 4);
+
+// L.mapbox.styleLayer('mapbox://styles/mapbox/satellite-streets-v9').addTo(map);
+// L.mapbox.styleLayer('mapbox://styles/mapbox/dark-v9').addTo(map);
+// L.mapbox.styleLayer('mapbox://styles/mapbox/emerald-v9').addTo(map);
+// L.mapbox.styleLayer('mapbox://styles/mapbox/light-v9').addTo(map);
+
+new L.Control.Zoom({ position: 'topright' }).addTo(map);
+
+
+var circleMarkRenderer = function(ctx, info){
+    	var radius = info.value / 30 * info.width;
+		ctx.beginPath();
+        ctx.fillStyle = info.colorScale(info.value);
+    	ctx.arc(info.centerX - radius, info.centerY, radius, 0, 2*Math.PI);
+    	ctx.fill();
+    };
+
+var rectMarkRenderer = function(ctx, x, y, w, h, value, d, colorScale){
+		ctx.beginPath();
+        ctx.fillStyle = colorScale(value);
+    	ctx.rect(x - w / 2, y, w, h);
+    	ctx.fill();
+	};
+
+var transparentRectMarkRenderer = function(ctx, info){
+		ctx.beginPath();
+        ctx.fillStyle = info.colorScale(info.value);
+        ctx.globalAlpha = info.value / info.data.valuesMinMax[1]*1.2;
+    	ctx.rect(info.centerX - info.width / 2, info.centerY, info.width, info.height);
+    	ctx.fill();
+	};
+
+var vectorMarkRenderer = function(ctx, info){
+		var len = info.value / 24 * info.width * 6;
+		var angle = info.data.angles[info.latIndex][info.lonIndex];
+
+		ctx.save();
+		ctx.translate(info.centerX - info.width / 2, info.centerY);
+		ctx.rotate(angle);
+		ctx.beginPath();
+	    ctx.strokeStyle = '#666';
+	    // ctx.strokeStyle = colorScale(value);
+		ctx.moveTo(0, 0);
+		ctx.lineTo(0, len);
+		ctx.stroke();
+
+		ctx.beginPath();
+		ctx.moveTo(-info.width / 8, len  - info.width / 4);
+		ctx.lineTo(0, len);
+		ctx.lineTo(info.width / 8, len - info.width / 4);
+		ctx.stroke();
+
+		ctx.restore();
+	};
+
+var markerRenderer = function(ctx, info){
+    	var radius = 4;
+		ctx.beginPath();
+        ctx.fillStyle = 'black';
+        ctx.globalAlpha = 0.5;
+    	ctx.arc(info.centerX - radius, info.centerY, radius, 0, 2*Math.PI);
+    	ctx.fill();
+	};
+
+var gridLayer = new DataGridLayer({
+	markRenderer: transparentRectMarkRenderer,
+	// markRenderer: vectorMarkRenderer,
+	markerRenderer: markerRenderer
+});
+
+map.addLayer(gridLayer);
+
+
+
+// populateData();
+// loadData('noaa_gfs_global_sflux_0.12d', 'Land_cover_0__sea_1__land_surface[0:1:0][0:1:287][0:1:575],time');
+// loadData('noaa_gfs_global_sflux_0.12d', 'Temperature_hybrid[0:1:0][0:1:0][0:1:287][0:1:575],time', renderMap);
+// loadData('noaa_gfs_global_sflux_0.12d', 'Temperature_hybrid[0:1:0][0:1:0][0:1:1535][0:1:3071]');
+// loadData('nasa_ghrsst_global_daily', 'analysed_sst[0:1:0][0:100:15999][0:100:35999],time');
+loadStaticData(renderMap);
+loadWindFarms(renderWindFarms);
+
+function renderMap(d){
+	var flattenedValues = flattenAndUniquify(d.values).flattened;
+    gridLayer.setColorScale(equalizeBrewerSpectral(flattenedValues));
+    gridLayer.setGridData(d);
+    gridLayer.renderGrid();
+}
+
+function renderWindFarms(d){
+	gridLayer.setMarkersData(d);
+	gridLayer.renderMarkers();
+}
+
+
+
+
+
+</script>
+</body>
+</html>
