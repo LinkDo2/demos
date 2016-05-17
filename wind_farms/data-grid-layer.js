@@ -117,6 +117,9 @@ var DataGridLayer = L.Class.extend({
     renderMarkers: function(){
         var ctx = this._el.getContext('2d');
         var data = this.markersData;
+        if(!data) {
+            return this;
+        }
 
         /*
             TODO:
