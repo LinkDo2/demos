@@ -4,7 +4,7 @@
 <script src='https://api.mapbox.com/mapbox.js/v2.4.0/mapbox.js'></script>
 <script src='https://d3js.org/d3.v3.js'></script>
 <script src='jsdap.js'></script>
-<script src='node_modules/async/dist/async.js'></script>
+<script src='async.js'></script>
 <script src='data-utils.js'></script>
 <script src='data-manager.js'></script>
 <script src='data-grid-layer.js'></script>
@@ -16,15 +16,21 @@
 </style>
 </head>
 <body>
-<div id="side-panel">
-	<img class="logo" src="planetos-logo.svg">
-	<img class="minimap" src="minimap.jpg"/>
-	<div class="content">
-		<div class="title">Map of wind farms in the U.S. with current wind magnitude.</div>
-		<div class="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque risus lectus, pretium et efficitur eget, tristique a urna. Quisque non tellus eu magna mollis tincidunt. Aliquam auctor est leo, in congue orci aliquam ut. Pellentesque non nunc aliquam, faucibus eros sed, feugiat risus. Cras nibh mauris, vehicula vel commodo vel, tristique at neque. Pellentesque scelerisque laoreet ex, in mattis ex imperdiet eget. Morbi vehicula tincidunt scelerisque. Etiam lobortis, quam eu efficitur tincidunt, urna diam sollicitudin neque, vel molestie nulla orci a odio. Vivamus sollicitudin tellus risus. Nullam commodo ante ac luctus molestie. Interdum et malesuada fames ac ante ipsum primis in faucibus. Quisque faucibus nunc congue nunc imperdiet, in porttitor dolor rhoncus. Aliquam vestibulum mauris ipsum, id feugiat ex convallis quis.</div>
-	</div>
+
+<header><img class="logo" src="planetos-logo.svg"></header>
+<div class="wrapper">
+	<main class="content">
+		<div id="map"></div>
+	</main>
+	<nav class="nav">
+		<img class="minimap" src="minimap.jpg"/>
+        <div class="title">Map of wind farms in the U.S. with current wind magnitude.</div>
+		<div class="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque risus lectus, pretium et efficitur eget, tristique a urna. Quisque non tellus eu magna mollis tincidunt. Aliquam auctor est leo, in congue orci aliquam ut. Pellentesque non nunc aliquam, faucibus eros sed, feugiat risus. Cras nibh mauris, vehicula vel commodo vel, tristique at neque. Pellentesque scelerisque laoreet ex, in mattis ex imperdiet eget. Morbi vehicula tincidunt scelerisque. Etiam lobortis, quam eu efficitur tincidunt, urna diam sollicitudin neque, vel molestie nulla orci a odio. Vivamus sollicitudin tellus risus. Nullam commodo ante ac luctus molestie. Interdum et malesuada fames ac ante ipsum primis in faucibus. Quisque faucibus nunc congue nunc imperdiet, in porttitor dolor rhoncus. Aliquam vestibulum mauris ipsum, id feugiat ex convallis quis.
+		</div>
+	</nav>
 </div>
-<div id="map"></div>
+<footer>Copyright Planet OS 2016</footer>
+
 <script>
 
 /*
