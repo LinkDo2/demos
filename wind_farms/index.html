@@ -17,19 +17,24 @@
 </head>
 <body>
 
-<header><img class="logo" src="planetos-logo.svg"></header>
 <div class="wrapper">
 	<main class="content">
 		<div id="map"></div>
 	</main>
 	<nav class="nav">
-		<img class="minimap" src="minimap.jpg"/>
-        <div class="title">Map of wind farms in the U.S. with current wind magnitude.</div>
-		<div class="text">Lorem ipsum dolor sit amet, consectetur adipiscing elit. Quisque risus lectus, pretium et efficitur eget, tristique a urna. Quisque non tellus eu magna mollis tincidunt. Aliquam auctor est leo, in congue orci aliquam ut. Pellentesque non nunc aliquam, faucibus eros sed, feugiat risus. Cras nibh mauris, vehicula vel commodo vel, tristique at neque. Pellentesque scelerisque laoreet ex, in mattis ex imperdiet eget. Morbi vehicula tincidunt scelerisque. Etiam lobortis, quam eu efficitur tincidunt, urna diam sollicitudin neque, vel molestie nulla orci a odio. Vivamus sollicitudin tellus risus. Nullam commodo ante ac luctus molestie. Interdum et malesuada fames ac ante ipsum primis in faucibus. Quisque faucibus nunc congue nunc imperdiet, in porttitor dolor rhoncus. Aliquam vestibulum mauris ipsum, id feugiat ex convallis quis.
-		</div>
+        <h1>Map of wind farms in the U.S. with current wind speed.</h1> 
+        <hr />
+        <p>Farms sized by <emph class="size">production capacity</emph>.</p>
+        <p>Change it to be sized by <emph><a class="switcher" href="#">current wind speed</a></emph> at farm location.</p>
+        <img class="legend" src="wind-map-legend.svg">
+        <p>This is a quick demo showing how <a href="http://en.openei.org/wiki/Map_of_Wind_Farms/Data">wind farm data</a>
+        	can be augmented with <a href="http://data.planetos.com/datasets/noaa_gfs_global_sflux_0.12d:gfs-global-weather-forecast-by-ncep-near-surface-parameters">forecast data</a>
+        	using <a href="http://docs.planetos.com/">Planet OS API</a>.</p>
 	</nav>
+	<footer>
+		<img class="logo" src="planetos-logo.svg">
+	</footer>
 </div>
-<footer>Copyright Planet OS 2016</footer>
 
 <script>
 
@@ -40,6 +45,7 @@
 	-change resolution with zoom level by skipping
 	-automatic filter
 	-convert wind data script to node to output json file
+	-map resize should re-render
 */
 
 var southWest = L.latLng(89, 179),
@@ -48,11 +54,12 @@ var southWest = L.latLng(89, 179),
 
 // L.mapbox.accessToken = 'pk.eyJ1IjoicGxhbmV0b3MiLCJhIjoiZjZkNDE4MTE5NWNhOGYyMmZhZmNhMDQwMDg0YWMyNGUifQ.htlwo6U82iekTcpGtDR_dQ';
 L.mapbox.accessToken = 'pk.eyJ1IjoiY2hyaXN2aWF1IiwiYSI6ImFERnVTeXcifQ.Eun4jtPE8upbuP2uKawtFw';
-var map = L.mapbox.map('map', 'mapbox.streets', {
-// var map = L.mapbox.map('map', 'planetos.4f5251cf', {
+// var map = L.mapbox.map('map', 'mapbox.streets', {
+// var map = L.mapbox.map('map', 'mapbox.outdoors', {
+var map = L.mapbox.map('map', 'planetos.4f5251cf', {
 		maxBounds: bounds,
-		maxZoom: 19,
-    	minZoom: 2,
+		maxZoom: 8,
+    	minZoom: 4,
     	scrollWheelZoom: false,
     	attributionControl: false,
 	    tileLayer: {
@@ -61,18 +68,18 @@ var map = L.mapbox.map('map', 'mapbox.streets', {
 		},
 		zoomControl: false
 	})
-	.setView([40.371659, -100.195313], 4);
+	.setView([40.371659, -100.195313], 5);
 
 // L.mapbox.styleLayer('mapbox://styles/mapbox/satellite-streets-v9').addTo(map);
 // L.mapbox.styleLayer('mapbox://styles/mapbox/dark-v9').addTo(map);
 // L.mapbox.styleLayer('mapbox://styles/mapbox/emerald-v9').addTo(map);
-// L.mapbox.styleLayer('mapbox://styles/mapbox/light-v9').addTo(map);
+L.mapbox.styleLayer('mapbox://styles/mapbox/light-v9').addTo(map);
 
 new L.Control.Zoom({ position: 'topright' }).addTo(map);
 
 
 var circleMarkRenderer = function(ctx, info){
-    	var radius = info.value / 30 * info.width;
+    	var radius = info.value / info.data.valuesMinMax[1] * info.width;
 		ctx.beginPath();
         ctx.fillStyle = info.colorScale(info.value);
     	ctx.arc(info.centerX - radius, info.centerY, radius, 0, 2*Math.PI);
@@ -95,6 +102,9 @@ var transparentRectMarkRenderer = function(ctx, info){
 	};
 
 var vectorMarkRenderer = function(ctx, info){
+
+	// if(((info.columnIndex%2) === 0) && ((info.rowIndex%2) === 0)){
+		ctx.globalAlpha = 0.3;
 		var len = info.value / 24 * info.width * 6;
 		var angle = info.data.angles[info.latIndex][info.lonIndex];
 
@@ -115,24 +125,43 @@ var vectorMarkRenderer = function(ctx, info){
 		ctx.stroke();
 
 		ctx.restore();
+	// }
 	};
 
 var markerRenderer = function(ctx, info){
-    	var radius = 4;
+    	var radius = info.data.GeneratingCapacity / info.data.capacityMinMax[1] * 30 + 2;
+    	// var radius = info.data.magnitude / info.data.magnitudeMinMax[1] * 15 + 2;
+    	var color = ~~(info.data.magnitude / info.data.magnitudeMinMax[1] * 255);
 		ctx.beginPath();
-        ctx.fillStyle = 'black';
-        ctx.globalAlpha = 0.5;
-    	ctx.arc(info.centerX - radius, info.centerY, radius, 0, 2*Math.PI);
+        ctx.fillStyle = '#0fa20b';
+        // ctx.fillStyle = 'rgb('+0+', '+(255-color)+', '+color+')';
+        ctx.globalAlpha = 0.7;
+    	ctx.arc(info.centerX, info.centerY, radius, 0, 2*Math.PI);
+    	ctx.fill();
+	};
+
+var markerRenderer2 = function(ctx, info){
+    	var radius = info.data.GeneratingCapacity / info.data.capacityMinMax[1] * 30 + 2;
+    	var radius = info.data.magnitude / info.data.magnitudeMinMax[1] * 15 + 2;
+		ctx.beginPath();
+        ctx.fillStyle = 'royalblue';
+        ctx.globalAlpha = 0.7;
+    	ctx.arc(info.centerX, info.centerY, radius, 0, 2*Math.PI);
     	ctx.fill();
 	};
 
 var gridLayer = new DataGridLayer({
-	markRenderer: transparentRectMarkRenderer,
-	// markRenderer: vectorMarkRenderer,
-	markerRenderer: markerRenderer
+	renderer: transparentRectMarkRenderer,
+	// renderer: vectorMarkRenderer,
+	// renderer: circleMarkRenderer
+});
+
+var markerLayer = new DataMarkerLayer({
+	renderer: markerRenderer
 });
 
 map.addLayer(gridLayer);
+map.addLayer(markerLayer);
 
 
 
@@ -146,17 +175,30 @@ loadWindFarms(renderWindFarms);
 
 function renderMap(d){
 	var flattenedValues = flattenAndUniquify(d.values).flattened;
-    gridLayer.setColorScale(equalizeBrewerSpectral(flattenedValues));
-    gridLayer.setGridData(d);
-    gridLayer.renderGrid();
+    gridLayer.setColorScale(equalizeBrewerSpectral(flattenedValues))
+    	.setData(d)
+    	.render();
 }
 
 function renderWindFarms(d){
-	gridLayer.setMarkersData(d);
-	gridLayer.renderMarkers();
+	markerLayer.setData(d);
+	markerLayer.render();
 }
 
 
+var switcherText = ['current wind speed', 'production capacity'];
+var sizeNode = document.querySelector('.size');
+var switcherNode = document.querySelector('.switcher');
+switcherNode.addEventListener('click', function(event){
+
+		var switcherTextIs0 = event.target.innerText === switcherText[0];
+		switcherNode.innerText = switcherTextIs0 ? switcherText[1] : switcherText[0];
+		sizeNode.innerText = switcherTextIs0 ? switcherText[0] : switcherText[1];
+		var renderer = switcherTextIs0 ? markerRenderer2 : markerRenderer;
+
+		markerLayer.setRenderer(renderer)
+			.render();
+	});
 
 
 

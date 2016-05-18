@@ -136,13 +136,13 @@ function loadFile(cb) {
     oReq.send();
 }
 
-function loadWindFarms(cb) {
+function loadWindFarms_old(cb) {
     var fileURL = 'wind_farms2.csv';
     var oReq = new XMLHttpRequest();
     oReq.onload = function(e) {
         var data = d3.csv.parse(e.target.response);
 
-        var lonlat;
+        var lonlat, min = Number.MAX_VALUE, max = Number.MIN_VALUE
         data.forEach(function(d){
             lonLat = d.Coordinates.split(', ')
                 .map(function(dB){ return +dB.replace(/°/ig, '');
@@ -150,8 +150,53 @@ function loadWindFarms(cb) {
 
             d.lon = lonLat[1];
             d.lat = lonLat[0];
-            d.value = +d.GeneratingCapacity.replace(/ MW/ig, '');
+            d.capacity = +d.GeneratingCapacity.replace(/ MW/ig, '');
+            if(d.capacity < min) {
+                min = d.capacity;
+            }
+            if(d.capacity > max) {
+                max = d.capacity;
+            }
         });
+
+        data.forEach(function(d){
+            d.valuesMinMax = [min, max];
+        });
+
+        cb(data)
+    };
+    oReq.open('GET', fileURL, true);
+    oReq.send();
+}
+
+function loadWindFarms(cb) {
+    var fileURL = 'wind-farm-data.csv';
+    var oReq = new XMLHttpRequest();
+    oReq.onload = function(e) {
+        var data = d3.csv.parse(e.target.response);
+
+        var lonlat;
+        var capacityMin = Number.MAX_VALUE, capacityMax = Number.MIN_VALUE;
+        var magnitudeMin = Number.MAX_VALUE, magnitudeMax = Number.MIN_VALUE;
+        data.forEach(function(d){
+            d.lon = +d.lon;
+            d.lat = +d.lat;
+            d.magnitude = +d.magnitude;
+            d.GeneratingCapacity = +d.GeneratingCapacity;
+            d.NumberOfUnits = +d.NumberOfUnits;
+            capacityMin = (d.GeneratingCapacity < capacityMin)? d.GeneratingCapacity : capacityMin;
+            capacityMax = (d.GeneratingCapacity > capacityMax)? d.GeneratingCapacity : capacityMax;
+            magnitudeMin = (d.magnitude < magnitudeMin)? d.magnitude : magnitudeMin;
+            magnitudeMax = (d.magnitude > magnitudeMax)? d.magnitude : magnitudeMax;
+        });
+
+        data.forEach(function(d){
+            d.capacityMinMax = [capacityMin, capacityMax];
+            d.magnitudeMinMax = [magnitudeMin, magnitudeMax];
+        });
+
+        console.log(capacityMin, capacityMax, magnitudeMin, magnitudeMax);
+
         cb(data)
     };
     oReq.open('GET', fileURL, true);
