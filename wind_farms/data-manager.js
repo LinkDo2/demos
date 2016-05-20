@@ -195,6 +195,8 @@ function loadWindFarms(cb) {
             d.magnitudeMinMax = [magnitudeMin, magnitudeMax];
         });
 
+        data = data.filter(function(d){ return !!d.GeneratingCapacity; });
+
         console.log(capacityMin, capacityMax, magnitudeMin, magnitudeMax);
 
         cb(data)
