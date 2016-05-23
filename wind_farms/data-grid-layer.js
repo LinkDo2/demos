@@ -180,19 +180,48 @@ var ToggleControl = L.Control.extend({
         position: 'topright'
     },
 
+    initialize: function(options) {
+        this.clickCallback = function(d) {
+            return;
+        };
+        this.container;
+        this.activeID = 'production-capacity';
+    },
+
     onAdd: function(map) {
-        var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+        var that = this;
+        this.container = L.DomUtil.create('div', 'layer-switcher leaflet-bar leaflet-control leaflet-control-custom');
 
-        container.innerHTML = '<div class="button1">Button 1<div><div class="button2">Button 2<div>'
+        this.container.innerHTML = '<div id="production-capacity" class="layer-toggle active">Production Capacity</div><div id="current-wind-speed" class="layer-toggle">Current Wind Speed</div>';
 
-        container.style.backgroundColor = 'white';
-        container.style.width = '100px';
-        container.style.height = '30px';
-
-        container.onclick = function() {
-            console.log('buttonClicked');
+        this.container.onclick = function(e) {
+            that.clickCallback(e.target.id);
         }
 
-        return container;
+        return this.container;
+    },
+
+    setActive: function(buttonName) {
+        var buttonNameSelected = buttonName.replace(/[ ]/g, '-');
+
+        if (this.activeID === buttonNameSelected) {
+            return;
+        }
+
+        var buttons = this.container.querySelectorAll('.layer-toggle');
+
+        for (var i = 0; i < buttons.length; ++i) {
+            buttons[i].classList.remove('active');
+        }
+
+        this.container.querySelector('#' + buttonNameSelected).classList.add('active');
+
+        this.activeID = buttonNameSelected;
+        return this;
+    },
+
+    onClick: function(cb) {
+        this.clickCallback = cb;
+        return this;
     }
 });

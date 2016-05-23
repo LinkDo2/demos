@@ -46,14 +46,13 @@
     </div>
     <script>
     /*
-    	TODO:
-    	-generate legend
-    	-convert wind data script to node to output json file
+            TODO:
+            -convert wind data script to node to output json file
 
-    	-progressive rendering
-    	-change resolution with zoom level by skipping
-    	-automatic opendap filter
-    */
+            -progressive rendering
+            -change resolution with zoom level by skipping
+            -automatic opendap filter
+        */
 
     var southWest = L.latLng(89, 179),
         northEast = L.latLng(-89, -179),
@@ -154,14 +153,14 @@
         ctx.fill();
     };
 
-    var markerLegendRenderer = function(ctx, info){
-    	var radiusMin = 2, 
-        	radiusMax = 30,
-        	radiusSpan = radiusMax - radiusMin,
+    var markerLegendRenderer = function(ctx, info) {
+        var radiusMin = 2,
+            radiusMax = 30,
+            radiusSpan = radiusMax - radiusMin,
             radius = radiusMin + info.index * (radiusSpan / info.numElements);
 
         var centerX = radiusMax,
-        	centerY = info.index * radiusMax * 2 + radiusMax;
+            centerY = info.index * radiusMax * 2 + radiusMax;
 
         ctx.beginPath();
         ctx.fillStyle = info.color || '#838792';
@@ -187,8 +186,8 @@
     map.addLayer(markerLayer);
 
     var markerLegend = legend({
-    	container: document.querySelector('.legend-container'),
-		renderer: markerLegendRenderer
+        container: document.querySelector('.legend-container'),
+        renderer: markerLegendRenderer
     });
 
 
@@ -215,49 +214,59 @@
     }
 
     var capacityLegendData, magnitudeLegendData;
-    function processLegendData(d){
-		var capacityValues = d.map(function(d, i){ return d.GeneratingCapacity; });
-		var magnitudeValues = d.map(function(d, i){ return d.magnitude; });
-		capacityLegendData = {
-			minMax: [Math.min.apply(null, capacityValues), Math.max.apply(null, capacityValues)],
-			unit: 'MW'
-		};
-		magnitudeLegendData = {
-			minMax: [Math.min.apply(null, magnitudeValues), Math.max.apply(null, magnitudeValues)],
-			unit: 'm/s'
-		};
+
+    function processLegendData(d) {
+        var capacityValues = d.map(function(d, i) {
+            return d.GeneratingCapacity;
+        });
+        var magnitudeValues = d.map(function(d, i) {
+            return d.magnitude;
+        });
+        capacityLegendData = {
+            minMax: [Math.min.apply(null, capacityValues), Math.max.apply(null, capacityValues)],
+            unit: 'MW'
+        };
+        magnitudeLegendData = {
+            minMax: [Math.min.apply(null, magnitudeValues), Math.max.apply(null, magnitudeValues)],
+            unit: 'm/s'
+        };
     }
 
-    function renderLegend(){
-    	markerLegend.setData(capacityLegendData).render();
-    	markerLegend.setData(magnitudeLegendData).render();
+    function renderLegend() {
+        markerLegend.setData(capacityLegendData).render();
+        markerLegend.setData(magnitudeLegendData).render();
     }
 
 
-	map.addControl(new ToggleControl());
+    var switcherControl = new ToggleControl().onClick(switchLayer);
+    map.addControl(switcherControl);
 
     var switcherText = ['current wind speed', 'production capacity'];
     var sizeNode = document.querySelector('.size');
     var switcherNode = document.querySelector('.switcher');
     switcherNode.addEventListener('click', function(event) {
+        switchLayer(event.target.innerText.replace(/[ ]/g, '-'));
+    });
 
-        var switcherTextIs0 = event.target.innerText === switcherText[0];
+    function switchLayer(layerName){ 
+        switcherControl.setActive(layerName);
+
+        var switcherTextIs0 = layerName === switcherText[0].replace(/[ ]/g, '-');
+
         switcherNode.innerText = switcherTextIs0 ? switcherText[1] : switcherText[0];
         sizeNode.innerText = switcherTextIs0 ? switcherText[0] : switcherText[1];
+
         var renderer = switcherTextIs0 ? markerRenderer2 : markerRenderer;
 
-        markerLayer.setRenderer(renderer)
-            .render();
+        markerLayer.setRenderer(renderer).render();
 
-        if(switcherTextIs0){
-    		markerLegend.setData(magnitudeLegendData).render();
-    	}
-    	else{
-    		markerLegend.setData(capacityLegendData).render();
-    	}
+        if (switcherTextIs0) {
+            markerLegend.setData(magnitudeLegendData).render();
+        } else {
+            markerLegend.setData(capacityLegendData).render();
+        }
+    }
 
-
-    });
     </script>
 </body>
 
