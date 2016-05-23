@@ -94,17 +94,24 @@ h1 {
 }
 
 hr {
-    border-color: #aaa;
+    border-color: #5B616F;
+    border-style: solid;
 }
 
 a,
 a:hover,
 a:visited {
     color: #4BD0FF;
+    text-decoration: none;
 }
 
 .data-grid-layer {
     position: absolute;
+}
+
+emph {
+    color: white;
+    font-weight: bold;
 }
 
 

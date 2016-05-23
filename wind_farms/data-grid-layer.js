@@ -33,7 +33,7 @@ var DataGridLayer = L.Class.extend({
     render: function() {
         var mapBounds = map.getBounds();
         var mapSize = map.getSize();
-        if(!this.data){
+        if (!this.data) {
             return this;
         }
         var lat = this.data.lat;
@@ -86,18 +86,18 @@ var DataGridLayer = L.Class.extend({
                 if (!isNaN(value) && i % 1 === 0 && j % 1 === 0) {
 
                     var info = {
-                        centerX: point.x, 
-                        centerY: point.y, 
-                        width: w, 
-                        height: h, 
-                        value: value, 
-                        data: this.data, 
+                        centerX: point.x,
+                        centerY: point.y,
+                        width: w,
+                        height: h,
+                        value: value,
+                        data: this.data,
                         columnIndex: i,
-                        rowIndex: j, 
+                        rowIndex: j,
                         lonIndex: lonIndex,
                         latIndex: latIndex,
-                        longitude: lon[lonIndex], 
-                        latitude: lat[latIndex], 
+                        longitude: lon[lonIndex],
+                        latitude: lat[latIndex],
                         colorScale: this.colorScale
                     };
 
@@ -114,12 +114,12 @@ var DataGridLayer = L.Class.extend({
         return this;
     },
 
-    setData: function(d){ 
+    setData: function(d) {
         this.data = d;
         return this;
     },
 
-    setRenderer: function(renderer){ 
+    setRenderer: function(renderer) {
         this.renderer = renderer;
         return this;
     }
@@ -128,10 +128,10 @@ var DataGridLayer = L.Class.extend({
 
 var DataMarkerLayer = DataGridLayer.extend({
 
-    render: function(){
+    render: function() {
         var mapBounds = map.getBounds();
         var mapSize = map.getSize();
-        if(!this.data){
+        if (!this.data) {
             return this;
         }
         var lat = this.data.lat;
@@ -146,7 +146,7 @@ var DataMarkerLayer = DataGridLayer.extend({
         ctx.globalAlpha = 1;
 
         var data = this.data;
-        if(!data) {
+        if (!data) {
             return this;
         }
 
@@ -162,7 +162,7 @@ var DataMarkerLayer = DataGridLayer.extend({
 
             info = {
                 data: data[i],
-                centerX: point.x, 
+                centerX: point.x,
                 centerY: point.y
             };
 
@@ -173,3 +173,26 @@ var DataMarkerLayer = DataGridLayer.extend({
 
 });
 
+
+var ToggleControl = L.Control.extend({
+
+    options: {
+        position: 'topright'
+    },
+
+    onAdd: function(map) {
+        var container = L.DomUtil.create('div', 'leaflet-bar leaflet-control leaflet-control-custom');
+
+        container.innerHTML = '<div class="button1">Button 1<div><div class="button2">Button 2<div>'
+
+        container.style.backgroundColor = 'white';
+        container.style.width = '100px';
+        container.style.height = '30px';
+
+        container.onclick = function() {
+            console.log('buttonClicked');
+        }
+
+        return container;
+    }
+});

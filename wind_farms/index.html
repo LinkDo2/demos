@@ -31,7 +31,9 @@
                     <emph class="size">production capacity</emph>.</p>
                 <p>Change it to be sized by
                     <emph><a class="switcher" href="#">current wind speed</a></emph> at farm location.</p>
+                <hr />
                 <div class="legend-container"></div>
+                <hr />
                 <p>This is a quick demo showing how <a href="http://en.openei.org/wiki/Map_of_Wind_Farms/Data">wind farm data</a> can be augmented with <a href="http://data.planetos.com/datasets/noaa_gfs_global_sflux_0.12d:gfs-global-weather-forecast-by-ncep-near-surface-parameters">forecast data</a> using <a href="http://docs.planetos.com/">Planet OS API</a>.
                 </p>
             </div>
@@ -162,13 +164,13 @@
         	centerY = info.index * radiusMax * 2 + radiusMax;
 
         ctx.beginPath();
-        ctx.fillStyle = info.color || 'silver';
+        ctx.fillStyle = info.color || '#838792';
         ctx.arc(centerX, centerY, radius, 0, 2 * Math.PI);
         ctx.fill();
 
-        ctx.font = "24px AvenirLTStd-Book, Helvetica Neue, Arial, Helvetica, sans-serif";
+        ctx.font = "20px AvenirLTStd-Book, Helvetica Neue, Arial, Helvetica, sans-serif";
         ctx.fillStyle = 'white';
-        ctx.fillText(info.label, centerX + radiusMax + 20, centerY + 6);
+        ctx.fillText(info.label, centerX + radiusMax + 20, centerY + 10);
     };
 
     var gridLayer = new DataGridLayer({
@@ -230,6 +232,9 @@
     	markerLegend.setData(capacityLegendData).render();
     	markerLegend.setData(magnitudeLegendData).render();
     }
+
+
+	map.addControl(new ToggleControl());
 
     var switcherText = ['current wind speed', 'production capacity'];
     var sizeNode = document.querySelector('.size');
