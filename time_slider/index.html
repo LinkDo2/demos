@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script src="nouislider.js"></script>
+    <link rel="stylesheet" type="text/css" href="nouislider.css">
+    <style>
+    body {
+        background-color: #fff;
+        color: #888;
+    }
+    
+    .wrapper {
+        width: 1000px;
+        position: relative;
+        margin: 0 auto;
+    }
+    
+    .container,
+    .container-local {
+        height: 500px;
+        position: relative;
+        margin: 0 auto;
+        padding-top: 20px;
+    }
+    
+    .container-local {
+        width: 600px;
+    }
+    
+    .info {
+        padding: 10px 0;
+        font-size: 1.5em;
+    }
+    
+    img {
+        position: absolute;
+        display: none;
+        width: 100%;
+        border: 2px solid #333;
+    }
+    
+    img.active {
+        display: block;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="container"></div>
+        <div class="info">Mean Period of Swell Waves</div>
+        <div class="slider"></div>
+        <div class="container-local"></div>
+    </div>
+    <script>
+    function preload(imageArray, container, index) {
+        index = index || 0;
+        if (imageArray && imageArray.length > index) {
+            var img = new Image();
+            img.onload = function() {
+                container.appendChild(img);
+                if (index === 0) {
+                    img.classList.add('active');
+                }
+                preload(imageArray, container, index + 1);
+            }
+            img.src = imageArray[index];
+        }
+    }
+
+    var container = document.querySelector('.container');
+    var images = [
+        'Mean_period_of_swell_waves_ordered_sequence_of_data_2016_06_17T18_00_00.png',
+        'Mean_period_of_swell_waves_ordered_sequence_of_data_2016_06_18T00_00_00.png',
+        'Mean_period_of_swell_waves_ordered_sequence_of_data_2016_06_18T06_00_00.png',
+        'Mean_period_of_swell_waves_ordered_sequence_of_data_2016_06_18T12_00_00.png',
+        'Mean_period_of_swell_waves_ordered_sequence_of_data_2016_06_18T18_00_00.png',
+        'Mean_period_of_swell_waves_ordered_sequence_of_data_2016_06_19T00_00_00.png',
+        'Mean_period_of_swell_waves_ordered_sequence_of_data_2016_06_19T06_00_00.png',
+        'Mean_period_of_swell_waves_ordered_sequence_of_data_2016_06_19T12_00_00.png',
+        'Mean_period_of_swell_waves_ordered_sequence_of_data_2016_06_19T18_00_00.png'
+    ];
+    preload(images, container);
+
+    localContainer = document.querySelector('.container-local');
+    var localImages = [
+        'mper_2016_06_05T21_00_00.png',
+        'mper_2016_06_06T21_00_00.png',
+        'mper_2016_06_07T21_00_00.png',
+        'mper_2016_06_08T21_00_00.png',
+        'mper_2016_06_09T21_00_00.png',
+        'mper_2016_06_10T21_00_00.png',
+        'mper_2016_06_11T21_00_00.png',
+        'mper_2016_06_12T21_00_00.png',
+        'mper_2016_06_13T21_00_00.png',
+        'mper_2016_06_14T21_00_00.png',
+        'mper_2016_06_15T21_00_00.png',
+        'mper_2016_06_16T21_00_00.png',
+        'mper_2016_06_17T21_00_00.png'
+    ];
+
+    preload(localImages, localContainer);
+
+    function setMapTimestamp(count) {
+        var imgNodes = container.querySelectorAll('img');
+        for (var i = 0; i < imgNodes.length; ++i) {
+            if (count === i) {
+                imgNodes[i].classList.add('active');
+            } else {
+                imgNodes[i].classList.remove('active');
+            }
+        }
+
+        var localImgNodes = localContainer.querySelectorAll('img');
+        for (var i = 0; i < localImgNodes.length; ++i) {
+            if (count === i) {
+                localImgNodes[i].classList.add('active');
+            } else {
+                localImgNodes[i].classList.remove('active');
+            }
+        }
+    }
+
+    var rangeSlider = document.querySelector('.slider');
+
+    noUiSlider.create(rangeSlider, {
+        start: [0],
+        step: 1,
+        animate: false,
+        range: {
+            'min': [0],
+            'max': [images.length - 1]
+        }
+    });
+
+    // var count = 0;
+    // setInterval(function() {
+    //     rangeSlider.noUiSlider.set(count);
+    //     count = (count + 1) % images.length;
+    // }, 500);
+
+    rangeSlider.noUiSlider.on('update', function(value) {
+        setMapTimestamp(~~value);
+    });
+    </script>
+</body>
+
+</html>
