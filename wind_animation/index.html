@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script src="nouislider.js"></script>
+    <link rel="stylesheet" type="text/css" href="nouislider.css">
+    <style>
+    body {
+        background-color: black;
+        color: #888;
+    }
+    
+    .wrapper {
+
+    }
+    
+    .container,
+    .container-local,
+    .svg-container {
+        height: 600px;
+        width: 1200px;
+        position: absolute;
+        padding-top: 80px;
+    }
+
+    .svg-container img {
+        height: 608px;
+    }
+    
+    .container-local {
+        width: 600px;
+    }
+    
+    .info {
+        padding: 10px 0;
+        font-size: 1.5em;
+    }
+    
+    .container img {
+        position: absolute;
+        display: none;
+        width: 100%;
+        border: 2px solid #333;
+    }
+    
+    .container img.active {
+        display: block;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="wrapper">
+        <div class="container"></div>
+        <!-- <div class="svg-container"><img src="./img/world.svg"></div> -->
+        <div class="info">BOM Average Zonal Wind at 10m</div>
+        <div class="slider"></div>
+        <div class="container-local"></div>
+    </div>
+    <script>
+    function preload(imageArray, container, index) {
+        index = index || 0;
+        if (imageArray && imageArray.length > index) {
+            var img = new Image();
+            img.onload = function() {
+                container.appendChild(img);
+                if (index === 0) {
+                    img.classList.add('active');
+                }
+                preload(imageArray, container, index + 1);
+            }
+            img.src = './img/' + imageArray[index];
+        }
+    }
+
+    var container = document.querySelector('.container');
+    var images = [
+"av10u_2016_06_19T03_00_00.jpg",
+"av10u_2016_06_19T06_00_00.jpg",
+"av10u_2016_06_19T09_00_00.jpg",
+"av10u_2016_06_19T12_00_00.jpg",
+"av10u_2016_06_19T15_00_00.jpg",
+"av10u_2016_06_19T18_00_00.jpg",
+"av10u_2016_06_19T21_00_00.jpg",
+"av10u_2016_06_20T00_00_00.jpg",
+"av10u_2016_06_20T03_00_00.jpg",
+"av10u_2016_06_20T06_00_00.jpg",
+"av10u_2016_06_20T09_00_00.jpg",
+"av10u_2016_06_20T12_00_00.jpg",
+"av10u_2016_06_20T15_00_00.jpg",
+"av10u_2016_06_20T18_00_00.jpg",
+"av10u_2016_06_20T21_00_00.jpg",
+"av10u_2016_06_21T00_00_00.jpg",
+"av10u_2016_06_21T03_00_00.jpg",
+"av10u_2016_06_21T06_00_00.jpg",
+"av10u_2016_06_21T09_00_00.jpg",
+"av10u_2016_06_21T12_00_00.jpg",
+"av10u_2016_06_21T15_00_00.jpg",
+"av10u_2016_06_21T18_00_00.jpg",
+"av10u_2016_06_21T21_00_00.jpg",
+"av10u_2016_06_22T00_00_00.jpg",
+"av10u_2016_06_22T03_00_00.jpg",
+"av10u_2016_06_22T06_00_00.jpg",
+"av10u_2016_06_22T09_00_00.jpg",
+"av10u_2016_06_22T12_00_00.jpg",
+"av10u_2016_06_22T15_00_00.jpg",
+"av10u_2016_06_22T18_00_00.jpg",
+"av10u_2016_06_22T21_00_00.jpg",
+"av10u_2016_06_23T00_00_00.jpg",
+"av10u_2016_06_23T03_00_00.jpg",
+"av10u_2016_06_23T06_00_00.jpg",
+"av10u_2016_06_23T09_00_00.jpg",
+"av10u_2016_06_23T12_00_00.jpg",
+"av10u_2016_06_23T15_00_00.jpg",
+"av10u_2016_06_23T18_00_00.jpg",
+"av10u_2016_06_23T21_00_00.jpg",
+"av10u_2016_06_24T00_00_00.jpg",
+"av10u_2016_06_24T03_00_00.jpg",
+"av10u_2016_06_24T06_00_00.jpg",
+"av10u_2016_06_24T09_00_00.jpg",
+"av10u_2016_06_24T12_00_00.jpg",
+"av10u_2016_06_24T15_00_00.jpg",
+"av10u_2016_06_24T18_00_00.jpg",
+"av10u_2016_06_24T21_00_00.jpg",
+"av10u_2016_06_25T00_00_00.jpg",
+"av10u_2016_06_25T03_00_00.jpg",
+"av10u_2016_06_25T06_00_00.jpg",
+"av10u_2016_06_25T09_00_00.jpg",
+"av10u_2016_06_25T12_00_00.jpg",
+"av10u_2016_06_25T15_00_00.jpg",
+"av10u_2016_06_25T18_00_00.jpg",
+"av10u_2016_06_25T21_00_00.jpg",
+"av10u_2016_06_26T00_00_00.jpg",
+"av10u_2016_06_26T03_00_00.jpg",
+"av10u_2016_06_26T06_00_00.jpg",
+"av10u_2016_06_26T09_00_00.jpg",
+"av10u_2016_06_26T12_00_00.jpg",
+"av10u_2016_06_26T15_00_00.jpg",
+"av10u_2016_06_26T18_00_00.jpg",
+"av10u_2016_06_26T21_00_00.jpg",
+"av10u_2016_06_27T00_00_00.jpg",
+"av10u_2016_06_27T03_00_00.jpg",
+"av10u_2016_06_27T06_00_00.jpg",
+"av10u_2016_06_27T09_00_00.jpg",
+"av10u_2016_06_27T12_00_00.jpg",
+"av10u_2016_06_27T15_00_00.jpg",
+"av10u_2016_06_27T18_00_00.jpg",
+"av10u_2016_06_27T21_00_00.jpg",
+"av10u_2016_06_28T00_00_00.jpg",
+"av10u_2016_06_28T03_00_00.jpg",
+"av10u_2016_06_28T06_00_00.jpg",
+"av10u_2016_06_28T09_00_00.jpg",
+"av10u_2016_06_28T12_00_00.jpg",
+"av10u_2016_06_28T15_00_00.jpg",
+"av10u_2016_06_28T18_00_00.jpg",
+"av10u_2016_06_28T21_00_00.jpg",
+"av10u_2016_06_29T00_00_00.jpg",
+"av10u_2016_06_29T03_00_00.jpg",
+"av10u_2016_06_29T06_00_00.jpg",
+"av10u_2016_06_29T09_00_00.jpg",
+"av10u_2016_06_29T12_00_00.jpg",
+"av10u_2016_06_29T15_00_00.jpg",
+"av10u_2016_06_29T18_00_00.jpg",
+"av10u_2016_06_29T21_00_00.jpg",
+"av10u_2016_06_30T00_00_00.jpg",
+"av10u_2016_06_30T03_00_00.jpg",
+"av10u_2016_06_30T06_00_00.jpg",
+"av10u_2016_06_30T09_00_00.jpg",
+"av10u_2016_06_30T12_00_00.jpg",
+"av10u_2016_06_30T15_00_00.jpg",
+"av10u_2016_06_30T18_00_00.jpg",
+"av10u_2016_06_30T21_00_00.jpg",
+"av10u_2016_07_01T00_00_00.jpg"
+    ];
+    preload(images, container);
+
+    function setMapTimestamp(count) {
+        var imgNodes = container.querySelectorAll('img');
+        for (var i = 0; i < imgNodes.length; ++i) {
+            if (count === i) {
+                imgNodes[i].classList.add('active');
+            } else {
+                imgNodes[i].classList.remove('active');
+            }
+        }
+    }
+
+    var count = 0;
+    setInterval(function() {
+        setMapTimestamp(count)
+        count = (count + 1) % (images.length);
+    }, 100);
+    </script>
+</body>
+
+</html>
