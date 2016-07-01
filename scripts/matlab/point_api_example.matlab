@@ -2,7 +2,7 @@
 % to iterate over a list of variables while plotting them.
 % please copy/paste your personal API key
 % from http://data.planetos.com/account/settings/
-apikey = 'cf445e00eeb643db918e9ded2eb2ff83'
+apikey = ''
 dataset_id = 'noaa_ww3_global_1.25x1d'
 api_root_url = 'http://api.planetos.com/v1/'
 
