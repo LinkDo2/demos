@@ -1,0 +1,263 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script src="https://d3js.org/d3.v3.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-rc.1/leaflet.js"></script>
+    <script src="https://cdn.rawgit.com/teralytics/Leaflet.D3SvgOverlay/master/L.D3SvgOverlay.js"></script>
+    <script src="https://planet-os.github.io/ui-components/utils/utils.js"></script>
+    <!-- <script src="../../ui-components/utils/utils.js"></script> -->
+    <script src="https://planet-os.github.io/ui-components/map/world-countries.js"></script>
+    <script src="https://planet-os.github.io/ui-components/map/map-component.js"></script>
+    <!-- <script src="../../ui-components/map/map-component.js"></script> -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.0-rc.1/leaflet.css" />
+    <script src="https://npmcdn.com/redux@latest/dist/redux.min.js"></script>
+    <style>
+    .map {
+        width: 1024px;
+        height: 512px;
+        display: block;
+    }
+    
+    .map svg {
+        stroke: black;
+    }
+    
+    select {
+        -webkit-appearance: none;
+        -moz-appearance: none;
+        appearance: none;
+        padding: 10px;
+        font-size: 1em;
+        display: block;
+        margin: 6px;
+    }
+    
+    select::-ms-expand {
+        display: none;
+    }
+    
+    .dropdown {
+        padding: 20px 0;
+    }
+    
+    .query {
+        padding: 20px;
+        border: 1px solid #aaa;
+        margin: 20px 0;
+    }
+    
+    a,
+    a:hover,
+    a:visited {
+        color: black;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="selector">
+        <div class="dropdown">
+            <select class="datasets"></select>
+            <select class="variables"></select>
+            <select class="timestamps"></select>
+        </div>
+    </div>
+    <div class="map"></div>
+    <div class="query">
+        <div class="preview-query"></div>
+    </div>
+    <script>
+    var baseURI = '54.197.14.109';
+    // var baseURI = 'localhost:8081';
+
+    function dataStates(state, action) {
+        if (typeof state === 'undefined') {
+            return {}
+        }
+        switch (action.type) {
+            case 'DATASET':
+                var datasets = action.datasets || state.datasets;
+                return Object.assign({}, state, {
+                    datasets: datasets,
+                    dataset: action.dataset || Object.keys(datasets)[0]
+                });
+            case 'VARIABLE':
+                var variables = action.variables || state.variables
+                return Object.assign({}, state, {
+                    variables: variables,
+                    variable: action.variableName ? variables[action.variableName] : action.variable
+                });
+            case 'TIMESTAMP':
+                return Object.assign({}, state, {
+                    timestamps: action.timestamps || state.timestamps,
+                    timestamp: action.timestamp
+                });
+            case 'PREVIEW':
+                return Object.assign({}, state, {
+                    data: action.data,
+                    query: action.query
+                });
+            default:
+                return state
+        }
+    }
+
+    var store = Redux.createStore(dataStates);
+
+    var previewQueryContainer = document.querySelector('.preview-query');
+    var datasetDropdownContainer = document.querySelector('.dropdown select.datasets');
+    var timestampDropdownContainer = document.querySelector('.dropdown select.timestamps');
+    var variableDropdownContainer = document.querySelector('.dropdown select.variables');
+
+    function render() {
+        var state = store.getState();
+
+        // datasets
+        html = '';
+        for (var dataset in state.datasets) {
+            if (dataset === state.dataset) {
+                html += '<option value="' + dataset + '" selected>' + state.datasets[dataset] + '</option>';
+            } else {
+                html += '<option value="' + dataset + '">' + state.datasets[dataset] + '</option>';
+            }
+        }
+        datasetDropdownContainer.innerHTML = html;
+
+        // variables
+        html = '';
+        for (var key in state.variables) {
+            var variable = state.variables[key];
+            var name = variable.name;
+            if (name === state.variable.name) {
+                html += '<option value="' + name + '" selected>' + name + '</option>';
+            } else {
+                html += '<option value="' + name + '">' + name + '</option>';
+            }
+        }
+
+        variableDropdownContainer.innerHTML = html;
+
+        // timestamps
+        html = '';
+        (state.timestamps || []).forEach(function(d) {
+            if (d === state.timestamp) {
+                html += '<option value="' + d + '" selected>' + d + '</option>';
+            } else {
+                html += '<option value="' + d + '">' + d + '</option>';
+            }
+
+        });
+        timestampDropdownContainer.innerHTML = html;
+
+        // query
+        previewQueryContainer.innerHTML = '<a href="' + state.query + '" target="_blank">' + state.query + '</a>';
+
+        // preview
+        if (state.data) {
+            map.renderRaster(state.data)
+        }
+
+        console.log('state', store.getState());
+    }
+
+    store.subscribe(render);
+
+    function getDatasets() {
+        d3.json('http://' + baseURI + '/datasets/', function(error, json) {
+            var dataset = Object.keys(json)[0];
+            store.dispatch({
+                type: 'DATASET',
+                datasets: json,
+                dataset: dataset
+            });
+            getVariables(dataset);
+        });
+    }
+
+    function getVariables(dataset) {
+        d3.json('http://' + baseURI + '/datasets/' + dataset + '/variables', function(error, json) {
+            var variables = json[dataset];
+            var variable = variables[Object.keys(variables)[0]];
+            store.dispatch({
+                type: 'VARIABLE',
+                variables: variables,
+                variableName: variable.name,
+                variable: variable
+            });
+            getTimestamps(variable);
+        });
+    }
+
+    function getTimestamps(variable) {
+        var timestamp = variable.timestamps[variable.timestamps.length - 1];
+        store.dispatch({
+            type: 'TIMESTAMP',
+            timestamps: variable.timestamps,
+            timestamp: timestamp
+        });
+        var state = store.getState();
+        getPreview(state.dataset, state.variable.name, timestamp);
+    }
+
+    function getPreview(dataset, variableName, timestamp) {
+        var uri = 'http://' + baseURI + '/datasets/' + dataset + '/variables/' + encodeURIComponent(variableName) + '/timestamps/' + timestamp + '/sample_data';
+
+        d3.json(uri, function(error, json) {
+            json.uniqueValues = utils.flattenAndUniquify(json.values).uniques;
+            store.dispatch({
+                type: 'PREVIEW',
+                data: json,
+                query: uri
+            });
+        });
+    }
+
+    getDatasets();
+
+    document.querySelector('.dropdown select.datasets')
+        .addEventListener('change', function() {
+            store.dispatch({
+                type: 'DATASET',
+                dataset: this.value
+            });
+            getVariables(this.value);
+        });
+
+    document.querySelector('.dropdown select.variables')
+        .addEventListener('change', function() {
+            store.dispatch({
+                type: 'VARIABLE',
+                variableName: this.value
+            });
+            getTimestamps(store.getState().variable);
+        });
+
+    document.querySelector('.dropdown select.timestamps')
+        .addEventListener('change', function() {
+            var timestamp = this.value;
+            store.dispatch({
+                type: 'TIMESTAMP',
+                timestamp: timestamp
+            });
+            var state = store.getState();
+            getPreview(state.dataset, state.variable.name, timestamp);
+        });
+
+    // Map
+    //////////////////////////////
+    var mapContainer = document.querySelector('.map');
+    var map = mapWrapper({
+            el: mapContainer
+        })
+        .init()
+        .renderMarker([0, 0]);
+
+    map.events.click.on(function(e) {
+        console.log(e);
+    });
+    </script>
+</body>
+
+</html>
