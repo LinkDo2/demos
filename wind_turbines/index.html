@@ -28,19 +28,17 @@
         fill-opacity: 0.8;
         stroke: #222;
     }
-    
-    .map .feature-label {
+    /*    .map .feature-label {
         width: 100px;
     }
     
     .map .feature-label div {
         width: 100%;
-    }
-    
-    .dot {
+    }*/
+    /*    .dot {
         font-size: 2em;
         line-height: 0;
-    }
+    }*/
     </style>
 </head>
 
@@ -96,11 +94,16 @@
             });
 
             var geojson = convertToGeojson(operationalTurbines);
+
             map.renderPolygon(geojson, {
                 radius: 25,
                 useIcon: true,
                 // useLabels: true,
                 icon: './windfarm_marker.png'
+            });
+            map.renderPolygon(geojson, {
+                radius: 25,
+                useLabels: true
             });
 
             var plannedTurbines = data.filter(function(d) {
@@ -112,6 +115,11 @@
                 radius: 25,
                 useIcon: true,
                 icon: './windfarm_marker2.png'
+            });
+
+            map.renderPolygon(geojson, {
+                radius: 25,
+                useLabels: true
             });
 
         });

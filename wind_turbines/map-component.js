@@ -406,9 +406,12 @@ var mapWrapper = function(_config) {
                         var featureData = getFeatureData(feature, latlng);
                         var label = L.divIcon({
                             className: 'feature-label', 
-                            html: '<div><div class="label">' + featureData.originalData.Name 
-                                + '</div><div class="dot">.</div></div>',
-                            iconSize: [300, 20]
+                            html: '<div class="label">' + featureData.originalData.Position 
+                                + '</div>',
+                            // html: '<div><div class="label">' + featureData.originalData.Name 
+                            //     + '</div><div class="dot">.</div></div>',
+                            iconSize: [20, 20],
+                            iconAnchor: [10, 10],
                         })
                         var marker = new L.marker(latlng, { icon: label });
                         return marker;
