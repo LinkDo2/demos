@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <script src="lib/d3.v3.js"></script>
+    <script src="lib/leaflet.js"></script>
+    <script src="lib/L.D3SvgOverlay.js"></script>
+    <script src="lib/utils.js"></script>
+    <script src="world-countries.js"></script>
+    <script src="map-component.js"></script>
+    <link rel="stylesheet" href="lib/leaflet.css" />
+    <style>
+    .map {
+        width: 1700px;
+        height: 1700px;
+        display: block;
+    }
+    
+    .map svg {
+        stroke: black;
+    }
+    
+    .map svg path.leaflet-interactive {
+        pointer-events: auto;
+        /*fill: darkorange;*/
+        stroke-opacity: 1;
+        fill-opacity: 0.8;
+        stroke: #222;
+    }
+    
+    .map .feature-label {
+        width: 100px;
+    }
+    
+    .map .feature-label div {
+        width: 100%;
+    }
+    
+    .dot {
+        font-size: 2em;
+        line-height: 0;
+    }
+    </style>
+</head>
+
+<body>
+    <div class="map"></div>
+    <script>
+    function convertToGeojson(items) {
+        var coordinates = items.map(function(d, i) {
+            return [d.lon, d.lat, d];
+        });
+
+        return {
+            "type": "Feature",
+            "properties": {
+                "name": "",
+            },
+            "geometry": {
+                "type": "MultiPoint",
+                "coordinates": coordinates
+            }
+        };
+    }
+
+    function getDatasets() {
+        d3.json('http://' + baseURI + '/datasets/', function(error, json) {
+            var dataset = Object.keys(json)[0];
+            store.dispatch({
+                type: 'DATASET',
+                datasets: json
+            });
+            getVariables(dataset);
+        });
+    }
+
+    function loadTurbines(cb) {
+        d3.csv('turbines.csv', function(error, csv) {
+            var data = [];
+            csv.forEach(function(d) {
+                data.push({
+                    lat: +d['Latitude'],
+                    lon: +d['Longitude'],
+                    operationalUnits: +d['Operational Units'],
+                    capacityMw: +d['Capacity (MW)'],
+                    status: d.Status,
+                    originalData: d
+                });
+            });
+
+            console.log(data);
+
+            var operationalTurbines = data.filter(function(d) {
+                return !!d.lat && d.status !== 'Planned/Under Construction';
+            });
+
+            var geojson = convertToGeojson(operationalTurbines);
+            map.renderPolygon(geojson, {
+                radius: 25,
+                useIcon: true,
+                // useLabels: true,
+                icon: './windfarm_marker.png'
+            });
+
+            var plannedTurbines = data.filter(function(d) {
+                return !!d.lat && d.status === 'Planned/Under Construction';
+            });
+
+            var geojson = convertToGeojson(plannedTurbines);
+            map.renderPolygon(geojson, {
+                radius: 25,
+                useIcon: true,
+                icon: './windfarm_marker2.png'
+            });
+
+        });
+        // map.renderMarker([0, 0])
+    }
+
+
+    // Map
+    //////////////////////////////
+    var mapContainer = document.querySelector('.map');
+    var map = mapWrapper({
+            el: mapContainer
+        })
+        .init()
+        .renderBasemap()
+        // .renderLineMap()
+        // .renderPolygon(geojsonFeature)
+        // .zoomToPolygonBoundingBox(geojsonFeature)
+        // .hideZoomControl()
+        // .renderMarker([0, 0])
+        // .renderRaster(rasterData)
+
+    map.events.click.on(function(e) {
+
+    });
+
+    loadTurbines();
+    </script>
+</body>
+
+</html>
