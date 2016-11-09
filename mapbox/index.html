@@ -1,0 +1,178 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Planet OS - Mapbox integration example</title>
+    <meta name='viewport' content='initial-scale=1,maximum-scale=1,user-scalable=no' />
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fetch/1.0.0/fetch.min.js" type="text/javascript"></script>
+    <script src="http://d3js.org/d3.v3.min.js" type="text/javascript"></script>
+    <script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.26.0/mapbox-gl.js'></script>
+    <link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.26.0/mapbox-gl.css' rel='stylesheet' />
+
+    <style>
+        body { margin:0; padding:0; }
+        #map { position:absolute; top:0; bottom:0; width:100%; }
+    </style>
+
+</head>
+<body>
+
+    <div id='map'></div>
+
+    <script>
+
+        // take settings from the url
+        var settings = {};
+        window.location.search.substring(1).split('&').forEach(function(q) {
+            var kv = q.split('=');
+            settings[kv[0]] = kv[1];
+        });
+
+        var datasetId = settings.dataset || 'noaa_wpc_qpf_1_7_days_6hr';
+        var variableName = settings.variable || 'APCP_surfaceMsurface';
+
+        if (settings.mapbox_key === undefined) {
+            console.log('Can not find "mapbox_key" in current URL, please add "&mapbox_key=<your_key>" to this URL.');
+        }
+
+        if (settings.planetos_key === undefined) {
+            console.log('Can not find "planetos_key" in current URL, please add "&planetos_key=<your_key>" to this URL.');
+        }
+        
+        var polygonQuery = JSON.stringify([
+            // polygon covering Seattle area
+            [-123.057861328125, 46.991494313050424 ], [-123.057861328125, 48.46563710044979 ], [-121.3055419921875, 48.46563710044979 ], [-121.3055419921875, 46.991494313050424 ], [-123.057861328125, 46.991494313050424 ]
+        ]);
+
+        mapboxgl.accessToken = settings.mapbox_key;
+
+        var map = new mapboxgl.Map({
+            container: 'map',
+            style: 'mapbox://styles/mapbox/dark-v9',
+            center: [-122.28332519531249, 47.73193447949174],
+            zoom: 9,
+            pitch: 42.5,
+            bearing: -0.364
+        });
+
+        function bridgeDataToMapbox(samples) {
+            var layer = samples.entries[0]; // &count=1 makes it one layer at a time
+            var layerData = layer.data[variableName];
+
+            var allValues = [].concat.apply([], layerData);
+
+            // calculating min/max from all values in the data sample
+            var minMaxValues = d3.extent(allValues);
+            // make scales for color-coding and height
+            var percScale = d3.scale.linear().domain(minMaxValues).range([0,100]);
+            var meterScale = d3.scale.linear().domain(minMaxValues).range([0,2000]); // 2000m highest
+
+            // init features array
+            var features = [];
+
+            // shortcut to all lat and longs
+            var latitudes = layer.indexAxes[0][1];
+            var longitudes = layer.indexAxes[1][1];
+
+            // calculate grid size from lats/longs
+            var latMinMax = d3.extent(latitudes);
+            var lonMinMax = d3.extent(longitudes);
+            var latStep = Math.abs((latMinMax[1] - latMinMax[0]) / latitudes.length);
+            var lonStep = Math.abs((lonMinMax[1] - lonMinMax[0]) / longitudes.length);
+
+            // little helper to turn grid center point into a rectangle polygon
+            function pointToRectPoly(lon, lat, lonstep, latstep) {
+                return [
+                    [
+                        [lon - lonstep, lat - latstep],
+                        [lon - lonstep, lat + latstep],
+                        [lon + lonstep, lat + latstep],
+                        [lon + lonstep, lat - latstep],
+                        [lon - lonstep, lat - latstep]
+                    ]
+                ];
+            }
+
+            // loop over data values matrix
+            for (var i = 0; i < layerData.length; i++) {
+                for (var k = 0; k < layerData[i].length; k++) {
+                    // calculate according percent scale
+                    var heatmap_pct = percScale(layerData[i][k]);
+                    // skip grid cells with "empty" value, might be wrong for some datasets
+                    if (heatmap_pct > 0) {
+                        features.push(
+                            {
+                              "type": "Feature",
+                              "properties": {
+                                // set properties for future use in styling
+                                "height_adjusted": meterScale(layerData[i][k]),
+                                "heatmap_pct": heatmap_pct
+                              },
+                              "geometry": {
+                                "coordinates": pointToRectPoly(longitudes[k], latitudes[i], lonStep/2, latStep/2),
+                                "type": "Polygon"
+                              },
+                              "id": i+"-"+k
+                            }
+                        );
+                    }
+                }
+            }
+
+            var geoJSON = {
+                "type": "FeatureCollection",
+                "features": features
+            };
+
+            console.log('bridgeDataToMapbox -> features.length:', features.length);
+
+            map.getSource('planetos_data').setData(geoJSON); // update Mapbox data
+        }
+
+        // map init routine
+        map.on('load', function() {
+
+            // create empty data set
+            map.addSource("planetos_data", {
+                'type': 'geojson',
+                'data': {
+                    "type": "FeatureCollection",
+                    "features": []
+                }
+            });
+
+            // create styling layer for the data set
+            map.addLayer({
+                'id': 'planetos_layer',
+                'type': 'fill',
+                'source': 'planetos_data',
+
+                'paint': {
+                    // might be handy to use fixed colour and variable opacity instead
+                    'fill-opacity': 0.75,
+                    'fill-color': {
+                        'property': 'heatmap_pct',
+                        'stops': [
+                            [0, '#D5F0FD'],
+                            [100, '#1C5BA0']
+                        ]
+                    },
+                    'fill-extrude-base': 50, // 50m above 0m surface
+                    'fill-extrude-height': {
+                        'property': 'height_adjusted',
+                        'type': 'identity'
+                    }
+                }
+            });
+
+            // fetch sample from the Planet OS Datahub API
+            fetch('http://api.planetos.com/v1/datasets/' + datasetId + '/area?var=' + variableName + '&polygon=' + polygonQuery + '&grouping=location&time_order=desc&count=1&apikey=' + settings.planetos_key)
+                .then(function(raw_response) { return raw_response.json(); })
+                .then(bridgeDataToMapbox);
+        });
+
+
+
+    </script>
+</body>
+</html>
