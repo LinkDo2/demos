@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+
+<link rel="stylesheet" href="style.css" charset="utf-8">
+<link href='https://api.tiles.mapbox.com/mapbox-gl-js/v0.28.0/mapbox-gl.css' rel='stylesheet' />
+<style type="text/css" media="screen">
+    .map-container { min-height: 600px; width:100%; }
+</style>
+
+<script src="../vendors/d3.js"></script>
+<script src="../vendors/topojson.js"></script>
+<script src="../components/world-110m.js"></script>
+<script src="../components/utils.js"></script>
+<script src="../vendors/geojson-rewind.js"></script>
+<script src="../vendors/piper.js"></script>
+<script src="../vendors/exoskeleton.js"></script>
+<script src="../vendors/backbone.nativeajax.js"></script>
+<script src="../vendors/backbone.nativeview.js"></script>
+<script src="../components/query-model.js"></script>
+<script src="../components/base-model.js"></script>
+<script src="../components/metadata-model.js"></script>
+<script src="../components/data-model.js"></script>
+<script src="../components/widget-views.js"></script>
+<script src='https://api.tiles.mapbox.com/mapbox-gl-js/v0.28.0/mapbox-gl.js'></script>
+
+</head>
+<body>
+
+    <header>
+        <h1>Planet OS APIs demo</h1>
+    </header>
+    <div id="main">
+        <article>
+            <div class="content-wrapper">
+                <div class="map-container" id="map-container"></div>
+                <div class="info-container"></div>
+                <div class="variable-wrapper">
+                    <div class="variable-container"></div>
+                </div>
+            </div>
+        </article>
+    </div>
+    <footer>Copyright Planet OS 2016</footer>
+
+    <script src="app-mapbox.js"></script>
+
+</body>
+</html>
