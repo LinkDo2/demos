@@ -19,7 +19,8 @@ var pointVariableListView = new PointVariableListView({
 });
 
 
-mapboxgl.accessToken = 'pk.eyJ1IjoiaWx5YSIsImEiOiJmMXlMZGVrIn0.FNpVvTkS5YtBHuxzOG0tCw';
+mapboxgl.accessToken = '!!! MY MAPBOX KEY HERE !!!';
+
 var map = new mapboxgl.Map({
     container: 'map-container', // container id
     style: 'mapbox://styles/mapbox/streets-v9',
