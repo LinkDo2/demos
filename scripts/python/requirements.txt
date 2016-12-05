@@ -1,0 +1,5 @@
+docopt
+pandas
+slumber
+matplotlib
+seaborn
