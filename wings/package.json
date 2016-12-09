@@ -1,0 +1,10 @@
+{
+  "name": "wings-prototype",
+  "version": "0.1.0",
+  "description": "Innogy Wings prototype",
+  "author": "Christophe Viau",
+  "license": "ISC",
+  "dependencies": {
+    "datahub-ui": "^0.3.0"
+  }
+}

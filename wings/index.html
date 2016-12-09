@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.7/leaflet.draw.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/d3/4.4.0/d3.js"></script>
+    <script src="https://d3js.org/d3-scale-chromatic.v1.min.js"></script>
+    <script src="node_modules/datahub-ui/src/datahub-utils.js"></script>
+    <script src="node_modules/datahub-ui/src/datahub-palette.js"></script>
+    <script src="node_modules/datahub-ui/src/datahub-data.js"></script>
+    <script src="node_modules/datahub-ui/src/datahub-map.js"></script>
+    <script src="node_modules/datahub-ui/src/datahub-chart.js"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.0.2/leaflet.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet.draw/0.4.7/leaflet.draw.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/flexboxgrid/6.3.1/flexboxgrid.min.css" />
+    <link href="https://fonts.googleapis.com/css?family=Roboto" rel="stylesheet">
+    <link href="node_modules/datahub-ui/style/components.css" rel="stylesheet">
+    <link href="layout.css" rel="stylesheet">
+    <link href="theme.css" rel="stylesheet">
+    <style>
+    div {
+        /*border: 1px silver solid;*/
+    }
+    </style>
+</head>
+
+<body>
+    <div id="header" class="row">
+        <div class="logo col-xs-12 col-sm-1">Innogy logo</div>
+        <div id="app" class="dropdown col-xs-12 col-sm-1">Onshore Winds</div>
+        <div id="fleet" class="dropdown col-xs-12 col-sm-1">Fleet</div>
+        <div id="view" class="dropdown col-xs-grow">O&M</div>
+        <div id="time-selector" class="buttons col-xs-12 col-sm-2">WTD-MTD-QTD</div>
+        <div id="date-selector" class="date col-xs-12 col-sm-2">Aug 1, 2016 - Aug 30, 2016</div>
+    </div>
+    <div id="content" class="container-fluid">
+        <div id="alerts" class="panel row">
+            <div class="col-xs-2 col-sm-1">
+                <div id="alert-band" class="medium"></div>
+            </div>
+            <div id="alert-message" class="col-xs-10 col-sm-5">
+                <div>
+                    Total Capacity Factor Underperforming.<br>
+                    <a href="">Italy</a> and <a href="">Poland</a> are the least performant.
+                </div>
+            </div>
+            <div class="col-xs-12 col-sm-6">
+                <div class="row">
+                    <div class="widget col-xs col-sm-4">Number</div>
+                    <div class="widget col-xs col-sm-4">Number</div>
+                    <div class="widget col-xs col-sm-4">Number</div>
+                </div>
+            </div>
+        </div>
+        <div id="top-metrics" class="panel row">
+            <div class="widget top-bar high col-xs-6 col-sm">Number</div>
+            <div class="widget top-bar medium col-xs-6 col-sm">Number</div>
+            <div class="widget top-bar low col-xs-6 col-sm">Number</div>
+            <div class="widget top-bar col-xs-6 col-sm">Number</div>
+            <div class="widget top-bar col-xs-6 col-sm">Number</div>
+        </div>
+        <div id="energy-income" class="detail-panel panel row">
+            <div class="title section col-xs-12 top-bar">ENERGY VS. INCOME</div>
+            <div class="number-section section col-xs-12">
+                <div class="row">
+                    <div class="widget col-xs-6 col-sm">Number</div>
+                    <div class="widget col-xs-6 col-sm">Number</div>
+                    <div class="widget col-xs-6 col-sm">Number</div>
+                    <div class="widget col-xs-6 col-sm">Number</div>
+                    <div class="widget col-xs-6 col-sm">Number</div>
+                    <div class="widget col-xs-6 col-sm">Number</div>
+                </div>
+            </div>
+            <div class="chart-section section col-xs-12">Chart</div>
+            <div class="table-section section col-xs-12">Table</div>
+        </div>
+        <div id="availability" class="detail-panel panel row">
+            <div class="title section col-xs-12 top-bar">AVAILABILITY</div>
+            <div class="number-section section col-xs-12">
+                <div class="row">
+                    <div class="widget col-xs-6 col-sm">Number</div>
+                    <div class="widget col-xs-6 col-sm">Number</div>
+                    <div class="widget col-xs-6 col-sm">Number</div>
+                    <div class="widget col-xs-6 col-sm">Number</div>
+                </div>
+            </div>
+            <div class="chart-section section col-xs-12">Chart</div>
+        </div>
+        <div id="capacity" class="detail-panel panel row">
+            <div class="title section col-xs-12 top-bar">CAPACITY FACTOR</div>
+            <div class="number-section section col-xs-12">
+                <div class="row">
+                    <div class="widget col-xs-6 col-sm">Number</div>
+                    <div class="widget col-xs-6 col-sm">Number</div>
+                    <div class="widget col-xs-6 col-sm">Number</div>
+                    <div class="widget col-xs-6 col-sm">Number</div>
+                </div>
+            </div>
+            <div class="chart-section section col-xs-12">Chart</div>
+        </div>
+    </div>
+    <script>
+    /**/
+    /*
+        TODO:
+        - base layout using flexgrid
+        - basic panel styling
+        - panel titles. color bands
+        - add charts
+        - number widget
+    */
+    </script>
+</body>
+
+</html>

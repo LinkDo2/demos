@@ -1,0 +1,99 @@
+body {
+    margin: 0;
+    padding: 0;
+}
+
+#header.row {
+    margin: 0;
+}
+
+#header > div {
+    align-items: center;
+    display: flex;
+    height: 60px;
+}
+
+#header .logo {
+    min-width: 60px;
+}
+
+#content {}
+
+.panel {
+    margin-top: 20px;
+    margin-bottom: 20px;
+}
+
+.widget {
+    align-items: center;
+    display: flex;
+}
+
+#top-metrics .widget {
+    min-height: 150px;
+}
+
+#alert-band {
+    margin-left: -0.5em;
+    margin-right: -0.5em;
+    max-width: 64px;
+    height: 100%;
+}
+
+#alerts .widget {
+    height: 100px;
+}
+
+#alerts .row {
+    height: 100%;
+}
+
+#alerts-message {
+    padding: 20px 0;
+}
+
+.detail-panel .widget {
+    height: 150px;
+}
+
+#energy-income .widget {
+    height: 125px;
+}
+
+.chart-section {
+    height: 400px;
+}
+
+.table-section {
+    height: 350px;
+}
+
+.chart-section,
+.table-section {
+    align-items: center;
+    display: flex;
+    justify-content: center;
+}
+
+
+/* Flexgrid extension */
+
+.col-xs-grow {
+    flex-grow: 1;
+    padding-left: .5rem;
+    padding-right: .5rem;
+    box-sizing: border-box;
+    flex-basis: auto;
+    -ms-flex-preferred-size: auto;
+}
+
+@media only screen and (min-width: 48em) {
+    .col-sm-grow {
+        flex-grow: 1;
+        padding-left: .5rem;
+        padding-right: .5rem;
+        box-sizing: border-box;
+        flex-basis: auto;
+        -ms-flex-preferred-size: auto;
+    }
+}
