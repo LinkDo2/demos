@@ -32,7 +32,7 @@ APIKEY = ''
 POLYGON = ''
 DATASET_ID = ''
 VARIABLE = None
-PAGESIZE = 1  # timestamps per request
+PAGESIZE = 3  # timestamps per request
 
 if 'PLANETOS_APIKEY' in os.environ:
     APIKEY = os.environ['PLANETOS_APIKEY']
@@ -43,7 +43,7 @@ API = slumber.API('http://api.planetos.com/v1/', append_slash=False, format='jso
 def fetch_metadata():
     return API.datasets(DATASET_ID).get(apikey=APIKEY)
 
-def fetch_layer(page=0, max_page=None, start_time=None, end_time=None):
+def fetch_batch(page=0, max_page=None, start_time=None, end_time=None):
     while True:
         print ("fetching page: %s" % page)
 
@@ -70,11 +70,13 @@ def fetch_layer(page=0, max_page=None, start_time=None, end_time=None):
 
         yield res
 
+        # check if maximum limit of pages set and stop if it reached
         if max_page is not None and page > max_page:
             return
+        # continue to "paginate" while nextOffset is present
         if 'stats' in res and 'nextOffset' in res['stats']:
             page += 1
-        else:
+        else:  # stop "pagination"
             return
 
 def update_frame(i):
@@ -83,7 +85,6 @@ def update_frame(i):
     print(u'Saving frame #%s (%s)' % (i, key))
     # make it latitude-sorted (top > bottom == north > south)
     heatmap_data.sort_index(inplace=True, ascending=False)
-    # nx, ny = heatmap_data.T.shape
     ax = sns.heatmap(
         heatmap_data,
         annot=False,
@@ -124,7 +125,7 @@ if __name__ == '__main__':
 
     # for observational data we might need time limit
     # for forecast API limit to a single forecast run by default
-    if metadata['ProductType'] in ['Observation', 'Analysis']:
+    if metadata['ProductType'] in ['Observation', 'Analysis', 'Analysis, Observation']:
         end_time = datetime.utcnow()
         start_time = end_time - timedelta(days=days)
     else:
@@ -134,18 +135,26 @@ if __name__ == '__main__':
     print('Dataset type: %s' % metadata['ProductType'])
     print('Exact start/end period: %s - %s' % (start_time.isoformat(), end_time.isoformat()))
 
-    for frame in fetch_layer(start_time=start_time, end_time=end_time):
-        layer = frame['entries'][0]  # FIXME: works only when PAGESIZE == 1
-        layer_coords = dict()
-        for layer_coord in layer['indexAxes']:
-            layer_coords[layer_coord[0]] = layer_coord[1]
+    for frame in fetch_batch(start_time=start_time, end_time=end_time):
+        for layer in frame['entries']:  # single batch can contain more than one timestamp
+            layer_coords = dict()
+            # convert lists of axes into dict
+            for layer_coord in layer['indexAxes']:
+                layer_coords[layer_coord[0]] = layer_coord[1]
 
-        assert 'latitude' in layer_coords
-        assert 'longitude' in layer_coords
+            # latitude and longitude should be present in the axes output
+            # otherwise it's an API error
+            assert 'latitude' in layer_coords
+            assert 'longitude' in layer_coords
 
-        data_page = pd.DataFrame(layer['data'][VARIABLE], index=layer_coords['latitude'], columns=layer_coords['longitude'])
+            data_layer_per_timestamp = pd.DataFrame(
+                layer['data'][VARIABLE],
+                index=layer_coords['latitude'],
+                columns=layer_coords['longitude']
+            )
 
-        full_data_dict[layer['axes']['time']] = data_page
+            # group data frames by timestamp
+            full_data_dict[layer['axes']['time']] = data_layer_per_timestamp
 
     full_data_panel = pd.Panel(full_data_dict)
 
