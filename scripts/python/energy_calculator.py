@@ -227,7 +227,8 @@ if __name__ == '__main__':
 
     host.set_ylabel("Energy (MW)")
     par1.set_ylabel("Wind speed (m/s)")
-    # host.set_y
+    host.set_ylim(ymin=0)
+    par1.set_ylim(ymin=0)
 
     host.set_title(u"%s energy production forecast for location Lon: %s, Lat: %s\n(based on GFS weather forecast (reftime: %s) acquired from the Planet OS Datahub API)" % (turbine_model, grid_coords[0], grid_coords[1], reftime))
 
